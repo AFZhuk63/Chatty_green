@@ -1,1 +1,123 @@
+[S1] Создать GitHub-репозиторий chatty. Настроить базовую структуру: chatty/, users/, templates/, .gitignore, README.md.
+
+Acceptance Criteria:
+
+# Репозиторий создан.
+Django-проект и базовая структура каталогов добавлены.
+.gitignore исключает временные и служебные файлы.
+README.md содержит название проекта и инструкции по запуску.
+
+# 1. Создание корневой директории
+mkdir Chatty_green
+cd Chatty_green
+
+# 2. Создание виртуального окружения
+python -m venv venv
+
+# 3. Активация виртуального окружения
+# Windows:
+venv\Scripts\activate
+# macOS/Linux:
+source venv/bin/activate
+
+# 4. Установка Django
+pip install django
+
+# 5. Создание проекта с названием chatty
+django-admin startproject chatty .
+
+# 6. Проверка запуска сервера
+python manage.py runserver
+# открываем в браузере http://127.0.0.1:8000 и видим приветственную страницу Django.
+```
+The install worked successfully! Congratulations!
+View release notes for Django 5.2
+You are seeing this page because DEBUG=True is in your settings file and you have not configured any URLs.
+Django"...
+```
 # Chatty_green
+Обновленная и упрощенная схема проекта
+Chatty_green/
+├── chatty/                          # Django-проект
+│   ├── __init__.py
+│   ├── settings.py                  # Настройки (будет разделение на base/dev/prod)
+│   ├── urls.py                      # Корневой роутинг
+│   ├── asgi.py
+│   └── wsgi.py
+│
+├── core/                            # Общие компоненты
+│   ├── templates/                   # Базовые шаблоны (base.html, 404.html и др.)
+│   ├── static/                      # Общие CSS, JS, изображения
+│   ├── utils.py                     # Вспомогательные функции
+│   └── views.py                     # Статические страницы (о проекте, ошибки)
+│
+├── users/                           # Пользователи
+│   ├── models.py                    # Модель профиля
+│   ├── forms.py                     # Регистрация, логин, редактирование
+│   ├── views.py                     # Регистрация, логин, профиль
+│   ├── urls.py
+│   ├── templates/users/             # Шаблоны профиля, формы и т.д.
+│   └── admin.py
+│
+├── posts/                           # Посты и комментарии
+│   ├── models.py                    # Post, Comment, Like
+│   ├── forms.py                     # Форма создания поста, комментария
+│   ├── views.py                     # CRUD-представления
+│   ├── urls.py
+│   ├── templates/posts/            # Шаблоны для постов и ленты
+│   └── admin.py
+│
+├── subscriptions/                  # Подписки
+│   ├── models.py                    # Subscription
+│   ├── views.py                     # Подписка/отписка
+│   ├── urls.py
+│   └── templates/subscriptions/    # Шаблоны подписок
+│
+├── templates/                      # Глобальные шаблоны (если не в app)
+│   └── base.html
+│
+├── manage.py
+├── venv/
+├── requirements.txt                # Зависимости
+├── .env                            # Переменные окружения
+└── docker/                         # Docker конфигурации
+    ├── Dockerfile
+    ├── docker-compose.yml
+    └── nginx/
+        └── default.conf
+
+# Связи между приложениями:
+
+users.UserProfile связан с posts.Post и subscriptions.Subscription
+posts.Post связан с users, subscriptions, posts.Comment, posts.Like
+subscriptions.Subscription — связь "пользователь → подписки"
+
+# Команды:
+```
+В корне проекта Chatty_green (где находится manage.py) выполняем:
+
+python manage.py startapp users
+python manage.py startapp posts
+python manage.py startapp subscriptions
+python manage.py startapp core
+```
+# Открываем chatty/settings.py и добавяем в INSTALLED_APPS:
+
+```
+INSTALLED_APPS = [
+    # Системные
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+
+    # Наши приложения которые мы добавили 
+    'users',
+    'posts',
+    'subscriptions',
+    'core',
+]
+```
+
