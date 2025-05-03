@@ -12,6 +12,8 @@ services:
       - POSTGRES_PASSWORD=${PG_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5435:5432"
 
   web:
     image: chatty_green_web:latest      # <-- добавили
