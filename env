@@ -1,0 +1,26 @@
+
+SECRET_KEY = 'django-insecure-n=s5kr%x^h$7ur^*wwt6skj&pn$wm49##$9a)prz8_nv4nd09t'
+
+DEBUG=True
+
+EMAIL_HOST='smtp.gmail.com'
+EMAIL_PORT=587
+EMAIL_USE_TLS=True
+EMAIL_HOST_USER=chattygreen.project@gmail.com
+EMAIL_LOGIN_PASSWORD='asd123!?'
+EMAIL_HOST_PASSWORD='lllh yhld oaik bhxz'
+DEFAULT_FROM_EMAIL=chattygreen.project@gmail.com
+
+PG_NAME='postgres'
+PG_USER='postgres'
+PG_PASSWORD="password"
+PG_HOST='db'
+PG_PORT=5432
+
+#CLIENT_ID = 'Ov23licGleRHJKnup34d'
+#CLIENT_SECRET = '25c3d5ccefaa5f6350979be5616362c3623d357e'
+
+
+
+
+
