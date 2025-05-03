@@ -47,18 +47,18 @@ else:
 
 
 # Создание SocialApp для GitHub
-client_id = os.environ.get('CLIENT_ID')
-client_secret = os.environ.get('CLIENT_SECRET')
+#client_id = os.environ.get('CLIENT_ID')
+#client_secret = os.environ.get('CLIENT_SECRET')
 
-if not SocialApp.objects.filter(provider='github', client_id=client_id).exists():
-    print("Creating SocialApp for GitHub...")
-    app = SocialApp.objects.create(
-        provider='github',
-        name='GitHub',
-        client_id=client_id,
-        secret=client_secret,
-    )
-    app.sites.add(site)  # привязываем приложение к созданному сайту
-    app.save()
-else:
-    print("SocialApp for GitHub already exists.")
+#if not SocialApp.objects.filter(provider='github', client_id=client_id).exists():
+#    print("Creating SocialApp for GitHub...")
+#    app = SocialApp.objects.create(
+#        provider='github',
+#        name='GitHub',
+#        client_id=client_id,
+#        secret=client_secret,
+#    )
+#    app.sites.add(site)  # привязываем приложение к созданному сайту
+#    app.save()
+#else:
+#    print("SocialApp for GitHub already exists.")

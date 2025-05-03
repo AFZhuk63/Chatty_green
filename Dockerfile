@@ -23,6 +23,6 @@ ENV DOCKERIZED=1 \
 COPY . .
 
 # collectstatic -> /static  (путь выбирается по DOCKERIZED=1)
-RUN mkdir -p /static && python manage.py collectstatic --no-input
+#RUN mkdir -p /static && python manage.py collectstatic --no-input
 
 ENTRYPOINT ["./entrypoint.sh"]

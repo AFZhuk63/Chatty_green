@@ -14,7 +14,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
 
   web:
-    image: itg_web:latest      # <-- добавили
+    image: chatty_green_web:latest      # <-- добавили
     build: .
     container_name: web
     command: python manage.py runserver 0.0.0.0:8000
@@ -30,16 +30,16 @@ services:
       - .:/app
       - media_volume:/media
 
-  nginx:
-    build:
-      context: ./nginx      # берёт nginx/Dockerfile и nginx.conf
-    container_name: nginx
-    depends_on:
-      - web
-    volumes:
-      - media_volume:/media
-    ports:
-      - "80:80"
+#  nginx:
+#    build:
+#      context: ./nginx      # берёт nginx/Dockerfile и nginx.conf
+#    container_name: nginx
+#    depends_on:
+#      - web
+#    volumes:
+#      - media_volume:/media
+#    ports:
+#      - "80:80"
 
 volumes:
   postgres_data:
