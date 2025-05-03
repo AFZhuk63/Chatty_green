@@ -37,6 +37,7 @@ You are seeing this page because DEBUG=True is in your settings file and you hav
 Django"...
 ```
 # Chatty_green
+```
 Обновленная и упрощенная схема проекта
 Chatty_green/
 ├── chatty/                          # Django-проект
@@ -86,7 +87,7 @@ Chatty_green/
     ├── docker-compose.yml
     └── nginx/
         └── default.conf
-
+```
 # Связи между приложениями:
 
 users.UserProfile связан с posts.Post и subscriptions.Subscription
@@ -222,4 +223,175 @@ Frontend: HTML, Bootstrap (возможно Tailwind)
 Auth: Стандартная + расширение профиля
 DevOps: Docker, docker-compose, Nginx, Gunicorn
 Media: Django media storage для аватарок и изображений постов
+```
+# ЭТАПЫ РЕАЛИЗАЦИИ ПРОЕКТА
+# Шаг 1: Модель пользователя и профиля (users/models.py)
+```
+Создаем базовую модель users/models.py
+
+from django.db import models
+from django.contrib.auth.models import User
+from django.utils import timezone
+from PIL import Image
+import os
+
+def avatar_upload_path(instance, filename):
+    return f'avatars/user_{instance.user.id}/{filename}'
+
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    bio = models.TextField(max_length=500, blank=True, verbose_name='О себе')
+    avatar = models.ImageField(upload_to=avatar_upload_path, default='avatars/default.jpg', verbose_name='Аватар')
+    created_at = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f'Профиль пользователя {self.user.username}'
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+        # Уменьшаем размер аватара при сохранении
+        if self.avatar:
+            img_path = self.avatar.path
+            img = Image.open(img_path)
+            if img.height > 300 or img.width > 300:
+                output_size = (300, 300)
+                img.thumbnail(output_size)
+                img.save(img_path)
+```
+# Шаг 2. Связь моделей — в apps.py и сигналах
+Создадим сигнал, чтобы при создании User автоматически создавался UserProfile.
+# users/signals.py
+```
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.contrib.auth.models import User
+from .models import UserProfile
+
+@receiver(post_save, sender=User)
+def create_profile(sender, instance, created, **kwargs):
+    if created:
+        UserProfile.objects.create(user=instance)
+
+@receiver(post_save, sender=User)
+def save_profile(sender, instance, **kwargs):
+    instance.profile.save()
+```
+# Шаг 3. Подключим сигнал в apps.py
+```
+from django.apps import AppConfig
+
+class UsersConfig(AppConfig):
+    name = 'users'
+
+    def ready(self):
+        import users.signals
+
+```
+# Шаг 3. Миграции
+```
+python manage.py makemigrations users
+python manage.py migrate
+```
+# Шаг 4: Регистрация профиля в админке 
+# users/admin.py
+```
+from django.contrib import admin
+from .models import UserProfile
+
+@admin.register(UserProfile)
+class UserProfileAdmin(admin.ModelAdmin):
+    list_display = ('user', 'created_at')
+```
+
+# Шаг 5. Базовую навигацию urls.py и шаблоны. Структура URL-ов
+
+Cоздадаем:
+```
+Главный маршрут (chatty/urls.py)
+Подключение приложения users
+Базовый шаблон с навигацией (layout)
+# Шаг 2. Связь моделей — в apps.py и сигналах
+```
+# 5.1. Основной файл маршрутов Chatty/urls.py
+```
+from django.contrib import admin
+from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('users/', include('users.urls')),  # маршруты пользователей
+]
+
+# Подключение медиафайлов (аватары)
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+```
+# 5.1. users/urls.py — маршруты внутри приложения users
+# users/urls.py
+```
+from django.urls import path
+from . import views
+from django.contrib.auth import views as auth_views
+
+urlpatterns = [
+    path('register/', views.register, name='register'),
+    path('login/', auth_views.LoginView.as_view(template_name='users/login.html'), name='login'),
+    path('logout/', auth_views.LogoutView.as_view(template_name='users/logout.html'), name='logout'),
+    path('profile/', views.profile, name='profile'),
+]
+```
+# 6. Подключение шаблонов
+Структура папок шаблонов:
+```
+chatty_green/
+│
+├── templates/
+│   ├── users/
+│   │   ├── login.html
+│   │   ├── logout.html
+│   │   ├── register.html
+│   │   └── profile.html
+│   └── base.html
+```
+Шаблон templates/base.html (OlgaFaruk)
+```
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Chatty{% endblock %}</title>
+
+    <!-- Подключение Bootstrap через CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Дополнительные стили -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding-top: 56px; /* Добавьте если используете fixed navbar */
+        }
+    </style>
+</head>
+<body>
+    <!-- Включение навигационной панели (ТОЛЬКО ЗДЕСЬ) -->
+    {% include "include/navbar.html" %}
+
+    <main class="container mt-4">
+        {% block content %}
+        <!-- Здесь будет контент страниц -->
+        {% endblock %}
+    </main>
+
+    <!-- Включение футера -->
+    {% include "include/footer.html" %}
+</body>
+</html>
+
+
+# users/urls.py
 ```
