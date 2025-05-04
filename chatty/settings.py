@@ -142,4 +142,5 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 if not os.path.exists(MEDIA_ROOT):
     os.makedirs(MEDIA_ROOT)
 
-LOGIN_REDIRECT_URL = '/profile/{username}/'
+LOGOUT_REDIRECT_URL = 'home'
+

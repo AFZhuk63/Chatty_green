@@ -7,8 +7,21 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Главная</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Войти</a></li>
-                <li class="nav-item"><a class="nav-link btn btn-primary text-white" href="{% url 'register' %}">Регистрация</a></li>
+
+                {% if user.is_authenticated %}
+                    <li class="nav-item"><a class="nav-link" href="{% url 'profile' username=user.username %}">Профиль</a></li>
+
+                    <!-- Добавляем форму для выхода с POST-запросом -->
+                    <li class="nav-item">
+                        <form method="POST" action="{% url 'logout' %}" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="nav-link btn btn-link text-white">Выход</button>
+                        </form>
+                    </li>
+                {% else %}
+                    <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Войти</a></li>
+                    <li class="nav-item"><a class="nav-link btn btn-primary text-white" href="{% url 'register' %}">Регистрация</a></li>
+                {% endif %}
             </ul>
         </div>
     </div>

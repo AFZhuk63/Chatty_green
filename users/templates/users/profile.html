@@ -12,7 +12,7 @@
             <p><strong>Email:</strong> {{ user.email }}</p>
             <p><strong>О себе:</strong> {{ user.bio|default:"Не указано" }}</p>
             <a href="{% url 'edit_profile' username=user.username %}" class="btn btn-primary">Редактировать профиль</a>
-
+            <a href="{% url 'change_password' %}" class="btn btn-warning">Сменить пароль</a>
         </div>
     </div>
 </div>
