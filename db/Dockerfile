@@ -1,2 +1,2 @@
-FROM postgres:13
+FROM postgres:15
 CMD ["postgres"]
