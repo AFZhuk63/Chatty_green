@@ -6,7 +6,6 @@ from django.db import models
 from django.utils import timezone
 from PIL import Image
 import os
-
 from chatty import settings
 
 
@@ -21,10 +20,6 @@ class UserProfile(models.Model):
         related_name='profile'
     )
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(args, kwargs)
-        self.avatar = None
-
     def __str__(self):
         return f'Профиль пользователя {self.user.username}'
 
@@ -32,8 +27,8 @@ class UserProfile(models.Model):
         super().save(*args, **kwargs)
 
         # Уменьшаем размер аватара при сохранении
-        if self.avatar:
-            img_path = self.avatar.path
+        if self.user.avatar and os.path.exists(self.user.avatar.path):
+            img_path = self.user.avatar.path
             img = Image.open(img_path)
             if img.height > 300 or img.width > 300:
                 output_size = (300, 300)
@@ -42,9 +37,11 @@ class UserProfile(models.Model):
 
 
 class CustomUser(AbstractUser):
-    avatar = models.ImageField(upload_to='avatars/', default='avatars/default.jpg')
+    avatar = models.ImageField(upload_to='avatars/', default='avatars/default.png')
     bio = models.TextField(blank=True, verbose_name="О себе")
     contacts = models.CharField(max_length=255, blank=True, verbose_name="Контакты")
 
     def __str__(self):
         return self.username
+
+

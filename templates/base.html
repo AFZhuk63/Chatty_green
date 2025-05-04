@@ -12,8 +12,19 @@
     <!-- Дополнительные стили -->
     <style>
         body {
-            font-family: Arial, sans-serif;
-            padding-top: 56px; /* Добавьте если используете fixed navbar */
+            background-image: url("{{ MEDIA_URL }}background.jpg");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            margin: 0;
+            min-height: 100vh;
+        }
+
+        .content-wrapper {
+            background-color: rgba(255, 255, 255, 0.8); /* Полупрозрачная подложка */
+            min-height: 100vh;
+            padding: 20px;
         }
     </style>
 </head>

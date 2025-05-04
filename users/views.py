@@ -7,6 +7,9 @@ from django.contrib.auth import login
 from django.contrib.auth.models import User
 from .models import CustomUser  # если переопределялась модель
 from .forms import CustomUserCreationForm  # если форма расширялась
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib import messages
+from django.contrib.auth.views import LoginView
 
 
 def home(request):
@@ -28,3 +31,38 @@ def register(request):
 def profile(request, username):
     user = get_object_or_404(CustomUser, username=username)
     return render(request, 'users/profile.html', {'user': user})
+
+
+def login_view(request):
+    if request.method == 'POST':
+        form = AuthenticationForm(data=request.POST)
+        if form.is_valid():
+            user = form.get_user()
+            login(request, user)
+            # Редиректим на страницу профиля пользователя
+            return redirect('profile', username=user.username)
+        else:
+            messages.error(request, 'Неверный логин или пароль')
+    else:
+        form = AuthenticationForm()
+
+    return render(request, 'users/login.html', {'form': form})
+
+
+class CustomLoginView(LoginView):
+    def get_success_url(self):
+        return f'/profile/{self.request.user.username}'
+
+
+def edit_profile(request, username):
+    user = get_object_or_404(CustomUser, username=username)
+
+    if request.method == 'POST':
+        form = CustomUserCreationForm(request.POST, request.FILES, instance=user)  # Используйте нужную форму
+        if form.is_valid():
+            form.save()
+            return redirect('profile', username=user.username)
+    else:
+        form = CustomUserCreationForm(instance=user)  # Предзаполненная форма
+
+    return render(request, 'users/edit_profile.html', {'form': form, 'user': user})

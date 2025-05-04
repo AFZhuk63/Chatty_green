@@ -1,8 +1,11 @@
 import os
+from colorama import init, Fore, Style
+
+# Инициализация colorama
+init(autoreset=True)
 
 
-def print_tree_structure(startpath):
-    # Игнорируемые папки и файлы
+def print_tree_structure(startpath, output_file="structure.txt"):
     IGNORE = {
         '__pycache__', '.git', '.idea', '.venv', '.vscode',
         'env', '.env', 'staticfiles', 'node_modules', 'vendor', 'setuptools', 'requests-2.32.3.dist-info',
@@ -10,19 +13,30 @@ def print_tree_structure(startpath):
         'series', 'Lib'
     }
 
-    # Разрешенные расширения
-    ALLOWED_EXT = {'.py', '.html', '.css', '.txt', '.json', '.yml', '.sh', '.conf'}
+    ALLOWED_EXT = {'.py', '.html', '.css', '.txt', '.json', '.yml', '.sh', '.conf', '.png', '.jpg', '.jpeg', '.gif'}
     ALLOWED_FILES = {'Dockerfile', 'docker-compose.yml', 'manage.py'}
 
-    print(f"{os.path.basename(startpath)}/")
-    _print_tree(startpath, "", IGNORE, ALLOWED_EXT, ALLOWED_FILES)
+    lines = [f"{os.path.basename(startpath)}/"]
+    _print_tree(startpath, "", IGNORE, ALLOWED_EXT, ALLOWED_FILES, lines)
+
+    # Вывод в консоль с цветами
+    print("СТРУКТУРА ПРОЕКТА:")
+    for line in lines:
+        if line.endswith("/"):
+            print(Fore.YELLOW + line)
+        else:
+            print(Fore.GREEN + line)
+
+    # Сохраняем в файл (без цветов)
+    with open(output_file, "w", encoding="utf-8") as f:
+        for line in lines:
+            f.write(line + "\n")
 
 
-def _print_tree(path, prefix, ignore, allowed_ext, allowed_files):
-    entries = []
+def _print_tree(path, prefix, ignore, allowed_ext, allowed_files, lines):
     try:
         entries = sorted(os.listdir(path))
-    except:
+    except Exception:
         return
 
     entries = [e for e in entries if e not in ignore and not e.startswith('.')]
@@ -32,18 +46,15 @@ def _print_tree(path, prefix, ignore, allowed_ext, allowed_files):
         is_last = i == len(entries) - 1
 
         if os.path.isdir(full_path):
-            # Обработка директории
-            print(f"{prefix}{'└── ' if is_last else '├── '}{entry}/")
+            lines.append(f"{prefix}{'└── ' if is_last else '├── '}{entry}/")
             new_prefix = prefix + ("    " if is_last else "│   ")
-            _print_tree(full_path, new_prefix, ignore, allowed_ext, allowed_files)
+            _print_tree(full_path, new_prefix, ignore, allowed_ext, allowed_files, lines)
         else:
-            # Обработка файла
             ext = os.path.splitext(entry)[1]
             if ext in allowed_ext or entry in allowed_files:
-                print(f"{prefix}{'└── ' if is_last else '├── '}{entry}")
+                lines.append(f"{prefix}{'└── ' if is_last else '├── '}{entry}")
 
 
 if __name__ == "__main__":
     project_path = os.getcwd()
-    print("СТРУКТУРА ПРОЕКТА:")
     print_tree_structure(project_path)

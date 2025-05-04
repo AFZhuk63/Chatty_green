@@ -65,9 +65,10 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            os.path.join(BASE_DIR, 'templates'),
-            os.path.join(BASE_DIR, 'users', 'templates'),
+            os.path.join(BASE_DIR, 'templates'),  # для общей папки templates
+            os.path.join(BASE_DIR, 'users/templates'),  #  это для папки с шаблонами пользователей
         ],
+        'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.request',
@@ -128,6 +129,7 @@ STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'  # для collectstatic
 STATICFILES_DIRS = [BASE_DIR / 'static']  # дополнительные папки со статикой
 
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
@@ -139,3 +141,5 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # Создаем папку media если не существует
 if not os.path.exists(MEDIA_ROOT):
     os.makedirs(MEDIA_ROOT)
+
+LOGIN_REDIRECT_URL = '/profile/{username}/'

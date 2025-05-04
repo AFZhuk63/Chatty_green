@@ -1,0 +1,86 @@
+Chatty_green/
+├── Print_three_project.py
+├── chat/
+│   ├── __init__.py
+│   ├── admin.py
+│   ├── apps.py
+│   ├── migrations/
+│   │   └── __init__.py
+│   ├── models.py
+│   ├── tests.py
+│   └── views.py
+├── chatty/
+│   ├── __init__.py
+│   ├── asgi.py
+│   ├── settings.py
+│   ├── urls.py
+│   └── wsgi.py
+├── core/
+│   ├── __init__.py
+│   ├── admin.py
+│   ├── apps.py
+│   ├── migrations/
+│   │   └── __init__.py
+│   ├── models.py
+│   ├── tests.py
+│   └── views.py
+├── manage.py
+├── media/
+│   ├── avatars/
+│   │   └── default.png
+│   ├── backgraunt.jpg
+│   ├── backgraunt_2.jpg
+│   └── test.txt
+├── posts/
+│   ├── __init__.py
+│   ├── admin.py
+│   ├── apps.py
+│   ├── migrations/
+│   │   └── __init__.py
+│   ├── models.py
+│   ├── tests.py
+│   └── views.py
+├── requirements.txt
+├── static/
+│   └── test.txt
+├── structure.txt
+├── subscriptions/
+│   ├── __init__.py
+│   ├── admin.py
+│   ├── apps.py
+│   ├── migrations/
+│   │   └── __init__.py
+│   ├── models.py
+│   ├── tests.py
+│   └── views.py
+├── templates/
+│   ├── base.html
+│   ├── home.html
+│   ├── include/
+│   │   ├── footer.html
+│   │   └── navbar.html
+│   ├── register.html
+│   └── registration/
+│       └── login.html
+├── users/
+│   ├── __init__.py
+│   ├── admin.py
+│   ├── apps.py
+│   ├── forms.py
+│   ├── migrations/
+│   │   ├── 0001_initial.py
+│   │   └── __init__.py
+│   ├── models.py
+│   ├── signals.py
+│   ├── templates/
+│   │   └── users/
+│   │       ├── edit_profile.html
+│   │       ├── login.html
+│   │       ├── profile.html
+│   │       └── register.html
+│   ├── tests.py
+│   ├── urls.py
+│   └── views.py
+└── venv/
+    ├── Include/
+    ├── Scripts/
