@@ -1,5 +1,5 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container">
+    <div class="container-fluid" style="padding-right: 10mm;">
         <a class="navbar-brand" href="#">Chatty</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
@@ -7,8 +7,21 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Главная</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Войти</a></li>
-                <li class="nav-item"><a class="nav-link btn btn-primary text-white" href="{% url 'register' %}">Регистрация</a></li>
+
+                {% if user.is_authenticated %}
+                    <li class="nav-item"><a class="nav-link" href="{% url 'profile' username=user.username %}">Профиль</a></li>
+
+                    <!-- Добавляем форму для выхода с POST-запросом -->
+                    <li class="nav-item">
+                        <form method="POST" action="{% url 'logout' %}" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="nav-link btn btn-link text-white">Выход</button>
+                        </form>
+                    </li>
+                {% else %}
+                    <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Войти</a></li>
+                    <li class="nav-item"><a class="nav-link btn btn-primary text-white" href="{% url 'register' %}">Регистрация</a></li>
+                {% endif %}
             </ul>
         </div>
     </div>

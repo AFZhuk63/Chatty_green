@@ -395,4 +395,71 @@ chatty_green/
 
 # users/urls.py
 ```
-C
+templates/users/register.html
+```
+{% extends "base.html" %}
+{% block content %}
+<h2>Регистрация</h2>
+<form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Зарегистрироваться</button>
+</form>
+{% endblock %}
+```
+Финальные настройки в settings.py
+
+ settings.py
+```
+... другие настройки ...
+
+#Authentication settings
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+AUTH_USER_MODEL = 'your_app.CustomUser'  # <-- вот здесь
+
+STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'  # для collectstatic
+STATICFILES_DIRS = [BASE_DIR / 'static']  # дополнительные папки со статикой
+
+ ... остальные настройки ...
+ 
+ P.S. заменили ALLOWED_HOSTS = [] на ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'web']  # 'web' - имя сервиса в docker-compose
+```
+# Обновления для signals.py
+Улучшенная версия:
+```
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.conf import settings
+from .models import UserProfile
+
+User = settings.AUTH_USER_MODEL  # Используем кастомную модель пользователя
+
+@receiver(post_save, sender=User)
+def create_or_update_user_profile(sender, instance, created, **kwargs):
+    """
+    Создает или обновляет профиль пользователя при сохранении модели User.
+    """
+    if created:
+        UserProfile.objects.get_or_create(user=instance)
+    else:
+        # Безопасное обновление без рекурсии
+        if hasattr(instance, 'profile'):
+            instance.profile.save()
+```
+# Доработан apps.py
+```
+Добавлена строка в class UsersConfig(AppConfig):
+default_auto_field = 'django.db.models.BigAutoField'
+```
+# Эта реализация:
+
+- Использует кастомную модель пользователя
+- Избегает рекурсии
+- Обрабатывает случаи, когда профиль уже существует
+- Более безопасна и соответствует современным стандартам Django
+
+
