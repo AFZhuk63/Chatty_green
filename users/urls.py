@@ -4,7 +4,8 @@ from . import views
 from .views import CustomLoginView
 
 urlpatterns = [
-    path('', views.home, name='home'),  # главная страница
+    path('', views.welcome_view, name='welcome'),  # Приветственная страница
+    path('home/', views.home_view, name='home'),  # Основная страница
     path('register/', views.register, name='register'),
     path('login/', CustomLoginView.as_view(template_name='users/login.html'), name='login'),  # используем кастомное представление
     path('logout/', auth_views.LogoutView.as_view(next_page='home'), name='logout'),
