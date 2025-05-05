@@ -27,9 +27,11 @@ Chatty_green/
 ├── manage.py
 ├── media/
 │   ├── avatars/
-│   │   └── default.png
-│   ├── backgraunt.jpg
-│   ├── backgraunt_2.jpg
+│   │   ├── _brunette_man_2.jpg
+│   │   ├── boy_w_1.jpg
+│   │   ├── boy_w_1_JdhL1R3.jpg
+│   │   ├── default.png
+│   │   └── wom_2.jpg
 │   └── test.txt
 ├── posts/
 │   ├── __init__.py
@@ -42,6 +44,9 @@ Chatty_green/
 │   └── views.py
 ├── requirements.txt
 ├── static/
+│   ├── images/
+│   │   ├── backgraunt.jpg
+│   │   └── backgraunt_2.jpg
 │   └── test.txt
 ├── structure.txt
 ├── subscriptions/
@@ -69,13 +74,20 @@ Chatty_green/
 │   ├── forms.py
 │   ├── migrations/
 │   │   ├── 0001_initial.py
+│   │   ├── 0002_alter_customuser_avatar.py
 │   │   └── __init__.py
 │   ├── models.py
 │   ├── signals.py
 │   ├── templates/
 │   │   └── users/
+│   │       ├── change_password.html
 │   │       ├── edit_profile.html
 │   │       ├── login.html
+│   │       ├── logout.html
+│   │       ├── password_reset_complete.html
+│   │       ├── password_reset_confirm.html
+│   │       ├── password_reset_done.html
+│   │       ├── password_reset_form.html
 │   │       ├── profile.html
 │   │       └── register.html
 │   ├── tests.py

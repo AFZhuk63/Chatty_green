@@ -14,8 +14,15 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv
 
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(BASE_DIR / '.env')  # Явное указание пути
+
+env_path = BASE_DIR / '.env'
+if not env_path.exists():
+    print(f"\n⚠️ Внимание: файл .env не найден по пути: {env_path}\n")
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
@@ -23,8 +30,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-n=s5kr%x^h$7ur^*wwt6skj&pn$wm49##$9a)prz8_nv4nd09t'
 
-# Загрузка переменных окружения
-load_dotenv()
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -47,6 +52,7 @@ INSTALLED_APPS = [
     'subscriptions',
     'core',
     'chat',
+    'widget_tweaks',
 ]
 
 MIDDLEWARE = [
@@ -129,6 +135,24 @@ STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'  # для collectstatic
 STATICFILES_DIRS = [BASE_DIR / 'static']  # дополнительные папки со статикой
 
+# Email settings (после загрузки переменных окружения)
+# Email configuration (adapted for existing .env)
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = os.environ['EMAIL_HOST']  # Обязательная переменная
+EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 587))  # 587 по умолчанию
+EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True') == 'True'  # True по умолчанию
+EMAIL_HOST_USER = os.environ['EMAIL_HOST_USER']  # Обязательная переменная
+EMAIL_HOST_PASSWORD = os.environ['EMAIL_HOST_PASSWORD']  # Используем основной пароль из .env
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER)  # fallback на EMAIL_HOST_USER
+
+# Правильная валидация (используем os.getenv() напрямую)
+if not os.getenv('EMAIL_HOST_USER') or not os.getenv('EMAIL_HOST_PASSWORD'):
+    raise ValueError(
+        "Требуемые переменные окружения не найдены:\n"
+        f"EMAIL_HOST_USER: {'не установлен' if not os.getenv('EMAIL_HOST_USER') else 'OK'}\n"
+        f"EMAIL_HOST_PASSWORD: {'не установлен' if not os.getenv('EMAIL_HOST_PASSWORD') else 'OK'}\n"
+        "Проверьте файл .env в корне проекта"
+    )
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -142,5 +166,17 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 if not os.path.exists(MEDIA_ROOT):
     os.makedirs(MEDIA_ROOT)
 
-LOGOUT_REDIRECT_URL = 'home'
+# URL для входа
+LOGIN_URL = 'login'  # Используем имя нашего URL-пути для входа
+LOGIN_REDIRECT_URL = '/'  # Куда перенаправляет после успешного входа
 
+
+# Проверка загрузки переменных окружения
+print("\n=== Email Configuration ===")
+print(f"EMAIL_HOST: {EMAIL_HOST}")
+print(f"EMAIL_PORT: {EMAIL_PORT}")
+print(f"EMAIL_USE_TLS: {EMAIL_USE_TLS}")
+print(f"EMAIL_HOST_USER: {EMAIL_HOST_USER or 'не установлен'}")
+print(f"EMAIL_HOST_PASSWORD: {'установлен' if EMAIL_HOST_PASSWORD else 'не установлен'}")
+print(f"DEFAULT_FROM_EMAIL: {DEFAULT_FROM_EMAIL}")
+print("=========================\n")

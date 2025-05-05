@@ -14,6 +14,8 @@ from .forms import CustomUserEditForm
 from django.contrib.auth import update_session_auth_hash
 from django.contrib import messages
 from django.urls import reverse
+from django.contrib.auth.views import PasswordResetConfirmView
+from django.urls import reverse_lazy
 
 def home(request):
     return render(request, 'home.html')
@@ -91,3 +93,34 @@ class CustomLoginView(LoginView):
 
     def get_success_url(self):
         return reverse('profile', kwargs={'username': self.request.user.username})
+
+
+from django.contrib.auth.views import PasswordResetConfirmView
+from django.urls import reverse_lazy
+
+
+class LoggingPasswordResetConfirmView(PasswordResetConfirmView):
+    success_url = reverse_lazy('password_reset_complete')
+
+    def form_valid(self, form):
+        # Логирование перед изменением пароля
+        user = form.user
+        print(f"\n=== DEBUG: Password Reset ===")
+        print(f"User: {user.username} (ID: {user.id})")
+        print(f"Old password hash: {user.password}")
+
+        # Сохраняем старый хеш для сравнения
+        old_password_hash = user.password
+
+        # Вызываем родительский метод (который меняет пароль)
+        response = super().form_valid(form)
+
+        # Обновляем объект пользователя из БД
+        user.refresh_from_db()
+
+        # Логирование после изменения
+        print(f"New password hash: {user.password}")
+        print(f"Password changed: {old_password_hash != user.password}")
+        print("============================\n")
+
+        return response
