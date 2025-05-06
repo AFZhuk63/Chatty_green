@@ -28,6 +28,7 @@ Chatty_green/
 ├── media/
 │   ├── avatars/
 │   │   ├── _brunette_man_2.jpg
+│   │   ├── _brunette_man_2_O3wICJm.jpg
 │   │   ├── boy_w_1.jpg
 │   │   ├── boy_w_1_JdhL1R3.jpg
 │   │   ├── default.png
@@ -65,8 +66,7 @@ Chatty_green/
 │   │   ├── footer.html
 │   │   └── navbar.html
 │   ├── register.html
-│   └── registration/
-│       └── login.html
+│   └── {% static 'images/
 ├── users/
 │   ├── __init__.py
 │   ├── admin.py
@@ -79,7 +79,9 @@ Chatty_green/
 │   ├── models.py
 │   ├── signals.py
 │   ├── templates/
+│   │   ├── __init__.py
 │   │   └── users/
+│   │       ├── __init__.py
 │   │       ├── change_password.html
 │   │       ├── edit_profile.html
 │   │       ├── login.html
@@ -90,6 +92,9 @@ Chatty_green/
 │   │       ├── password_reset_form.html
 │   │       ├── profile.html
 │   │       └── register.html
+│   ├── templatetags/
+│   │   ├── __init__.py
+│   │   └── form_filters.py
 │   ├── tests.py
 │   ├── urls.py
 │   └── views.py

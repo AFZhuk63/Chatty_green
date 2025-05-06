@@ -17,6 +17,13 @@ from django.urls import reverse
 from django.contrib.auth.views import PasswordResetConfirmView
 from django.urls import reverse_lazy
 
+
+def welcome_view(request):
+    return render(request, 'welcome.html')  # Загружаем welcome.html
+
+def home_view(request):
+    return render(request, 'home.html')  # Загружаем основную страницу (base.html)
+
 def home(request):
     return render(request, 'home.html')
 
