@@ -11,8 +11,8 @@ COPY requirements.txt .
 RUN pip install --upgrade pip && pip install -r requirements.txt
 
 # Скрипты
-#COPY entrypoint.sh wait-for-db.sh ./
-#RUN chmod +x entrypoint.sh wait-for-db.sh
+COPY entrypoint.sh wait-for-db.sh ./
+RUN chmod +x entrypoint.sh wait-for-db.sh
 
 # --- переменная окружения для этапа build ---
 ENV DOCKERIZED=1 \
@@ -25,4 +25,4 @@ COPY . .
 # collectstatic -> /static  (путь выбирается по DOCKERIZED=1)
 #RUN mkdir -p /static && python manage.py collectstatic --no-input
 
-#ENTRYPOINT ["./entrypoint.sh"]
+ENTRYPOINT ["./entrypoint.sh"]
