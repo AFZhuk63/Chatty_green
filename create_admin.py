@@ -18,9 +18,9 @@ User = get_user_model()
 
 
 # Параметры суперпользователя
-username = os.environ.get('DJANGO_SUPERUSER_USERNAME', 'admin')
-email = os.environ.get('DJANGO_SUPERUSER_EMAIL', 'admin@example.com')
-password = os.environ.get('DJANGO_SUPERUSER_PASSWORD', 'adminpass')
+username = os.environ.get('DJANGO_SUPERUSER_USERNAME', 'alex')
+email = os.environ.get('DJANGO_SUPERUSER_EMAIL', 'alex1@example.com')
+password = os.environ.get('DJANGO_SUPERUSER_PASSWORD', 'alexpass')
 
 
 # Создание суперпользователя
