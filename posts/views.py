@@ -1,28 +1,34 @@
-from django.shortcuts import render
-
-# Create your views here.
-from django.views.generic import UpdateView, DeleteView
-from django.urls import reverse_lazy
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.shortcuts import render, get_object_or_404
 from .models import Post
-from .forms import PostForm  # если форма уже есть
+from django.views.generic import ListView, DetailView
 
-class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+def post_list(request):
+    posts = Post.objects.all()
+    return render(request, 'blog/post_list.html', {'posts': posts})
+
+def post_detail_by_slag(request, slug):
+    post = get_object_or_404(Post, slug=slug)
+    return render(request, 'blog/post_detail.html', {'post': post})
+
+class PostListView(ListView):
     model = Post
-    form_class = PostForm
-    template_name = 'posts/post_form.html'  # переиспользуй шаблон создания
-    success_url = reverse_lazy('home')  # или куда тебе нужно
+    template_name = 'post_list.html'
+    context_object_name = 'posts'
+    paginate_by = 20
 
-    def test_func(self):
-        post = self.get_object()
-        return self.request.user == post.author
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
 
-
-class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+class PostDetailView(DetailView):
     model = Post
-    template_name = 'posts/post_confirm_delete.html'
-    success_url = reverse_lazy('home')
+    template_name = 'post_detail.html'
+    context_object_name = 'post'
 
-    def test_func(self):
-        post = self.get_object()
-        return self.request.user == post.author
+    def get(self, request, *args, **kwargs):
+        response = super().get(request, *args, **kwargs)
+        return response
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
