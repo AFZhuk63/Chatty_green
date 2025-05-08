@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'django.contrib.sites',
+
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -60,6 +61,8 @@ INSTALLED_APPS = [
     'chat',
     'widget_tweaks',
 ]
+
+SITE_ID = 1
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

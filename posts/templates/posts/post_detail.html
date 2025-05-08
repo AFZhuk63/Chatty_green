@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ post.title }}{% endblock %}
+
+{% block content %}
+  <h2>{{ post.title }}</h2>
+  <p class="mt-4">{{ post.content }}</p>
+
+  {% if user == post.author %}
+    <div class="mt-4">
+      <a href="{% url 'post_edit' post.slug %}" class="btn btn-warning">✏️ Редактировать</a>
+      <a href="{% url 'post_delete' post.slug %}" class="btn btn-danger ms-2">🗑️ Удалить</a>
+    </div>
+  {% endif %}
+{% endblock %}
