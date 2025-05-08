@@ -2,7 +2,8 @@ from django.db import models
 from django.urls import reverse
 from django.utils.text import slugify
 from django.contrib.auth import get_user_model
-
+from django.utils import timezone
+from django.conf import settings
 
 class Post(models.Model):
     author = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
@@ -28,3 +29,13 @@ class Post(models.Model):
 
     def get_absolute_url(self):
         return reverse('post_detail', kwargs={'slug': self.slug})
+
+
+class Comment(models.Model):
+    text = models.TextField()  # Текст комментария
+    created_at = models.DateTimeField(default=timezone.now)  # Дата и время создания
+    post = models.ForeignKey(Post, related_name='comments', on_delete=models.CASCADE)  # Привязка к посту
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)  # Привязка к пользователю
+
+    def __str__(self):
+        return f"Comment by {self.author.username} on {self.post.title}"
