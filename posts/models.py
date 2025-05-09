@@ -5,6 +5,11 @@ from django.contrib.auth import get_user_model
 from django.urls import reverse
 from django.utils import timezone
 
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
+
 
 class Post(models.Model):
     author = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
@@ -14,6 +19,7 @@ class Post(models.Model):
     publication_date = models.DateTimeField(auto_now_add=True)
     slug = models.SlugField(unique=True, blank=True)
     likes = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='liked_posts', blank=True)
+    dislikes = models.ManyToManyField(User, related_name='disliked_posts', blank=True)
 
     def save(self, *args, **kwargs):
         if not self.slug:

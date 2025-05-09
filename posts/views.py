@@ -29,9 +29,11 @@ class PostListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # Передаем количество лайков для каждого поста
         for post in context['posts']:
             post.likes_count = post.likes.count()
+            post.dislikes_count = post.dislikes.count()
+            post.likes_users = post.likes.all()
+            post.dislikes_users = post.dislikes.all()
         return context
 
 class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
@@ -72,7 +74,7 @@ class PostDetailView(DetailView):
             comment.post = self.object
             comment.author = request.user
             comment.save()
-            return redirect('post_detail', slug=self.object.slug)
+            return redirect('post_list')
 
         context = self.get_context_data()
         context['form'] = form
@@ -98,4 +100,25 @@ def like_post(request, slug):
     return JsonResponse({
         'liked': liked,
         'likes_count': post.likes.count()
+    })
+
+@require_POST
+def dislike_post(request, slug):
+    if not request.user.is_authenticated:
+        return HttpResponseForbidden("You must be logged in to dislike a post.")
+
+    post = get_object_or_404(Post, slug=slug)
+    user = request.user
+
+    if user in post.dislikes.all():
+        post.dislikes.remove(user)
+        disliked = False
+    else:
+        post.dislikes.add(user)
+        disliked = True
+        post.likes.remove(user)  # ❗ убираем лайк, если ставится дизлайк
+
+    return JsonResponse({
+        'disliked': disliked,
+        'dislikes_count': post.dislikes.count()
     })

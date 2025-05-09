@@ -190,7 +190,7 @@ if not os.path.exists(MEDIA_ROOT):
     os.makedirs(MEDIA_ROOT)
 
 # URL для входа
-LOGIN_URL = 'login'  # Используем имя нашего URL-пути для входа
+LOGIN_URL = 'home'  # Используем имя нашего URL-пути для входа на домашнюю страницу
 LOGIN_REDIRECT_URL = '/'  # Куда перенаправляет после успешного входа
 
 
