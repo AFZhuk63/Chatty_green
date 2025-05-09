@@ -1,15 +1,74 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ post.title }}{% endblock %}
-
 {% block content %}
-  <h2>{{ post.title }}</h2>
-  <p class="mt-4">{{ post.content }}</p>
+  <h1>{{ post.title }}</h1>
+  <p>{{ post.text }}</p>
+  <p><small>Posted by {{ post.author }} on {{ post.publication_date }}</small></p>
 
-  {% if user == post.author %}
-    <div class="mt-4">
-      <a href="{% url 'post_edit' post.slug %}" class="btn btn-warning">✏️ Редактировать</a>
-      <a href="{% url 'post_delete' post.slug %}" class="btn btn-danger ms-2">🗑️ Удалить</a>
+  <!-- Лайк-кнопка -->
+  <div class="my-3">
+    <button id="like-button" class="btn btn-outline-primary">
+      <span id="like-icon">{% if user in post.likes.all %}❤️{% else %}🤍{% endif %}</span>
+      <span id="like-count">{{ post.likes.count }}</span> Like{{ post.likes.count|pluralize }}
+    </button>
+  </div>
+
+  <hr>
+
+  <h3>Comments</h3>
+  {% for comment in comments %}
+    <div class="comment mb-3">
+      <p><strong>{{ comment.author.username }}</strong> said:</p>
+      <p>{{ comment.text }}</p>
+      <p><small>Posted on {{ comment.created_at }}</small></p>
+      <hr>
     </div>
+  {% empty %}
+    <p>No comments yet.</p>
+  {% endfor %}
+
+  <hr>
+
+  <h3>Add a comment</h3>
+  {% if user.is_authenticated %}
+    <form method="POST">
+      {% csrf_token %}
+      <div class="form-group">
+        {{ form.as_p }}
+      </div>
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+  {% else %}
+    <p>You must be logged in to leave a comment.</p>
   {% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('like-button').addEventListener('click', function () {
+  fetch("{% url 'like_post' post.slug %}", {
+    method: "POST",
+    headers: {
+      'X-CSRFToken': '{{ csrf_token }}',
+      'X-Requested-With': 'XMLHttpRequest',
+    },
+  })
+  .then(response => {
+    if (response.status === 403) {
+      alert("You must be logged in to like this post.");
+      return null;
+    }
+    return response.json();
+  })
+  .then(data => {
+    if (data) {
+      document.getElementById('like-count').textContent = data.likes_count;
+      document.getElementById('like-icon').textContent = data.liked ? '❤️' : '🤍';
+    }
+  })
+  .catch(error => {
+    console.error("Error liking post:", error);
+  });
+});
+</script>
 {% endblock %}

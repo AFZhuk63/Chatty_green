@@ -15,11 +15,27 @@
       <ul class="list-group">
         {% for post in posts %}
           <li class="list-group-item">
-            <a href="{% url 'post_detail' post.slug %}" class="fw-bold text-decoration-none text-dark">
-              {{ post.title|default:"(Без заголовка)" }}
-            </a>
+            {% if post.slug %}
+              <a href="{% url 'post_detail' post.slug %}" class="fw-bold text-decoration-none text-dark">
+                {{ post.title|default:"(Без заголовка)" }}
+              </a>
+            {% else %}
+              <span class="text-danger">Пост без slug: {{ post.title|default:"(Без заголовка)" }}</span>
+            {% endif %}
             <div class="text-muted small">
               Автор: {{ post.author.username }} • {{ post.created_at|date:"d.m.Y H:i" }}
+            </div>
+
+            <!-- Лайк-кнопка с иконкой 👍 -->
+            <div class="mt-2">
+              <span class="thumb-up">
+                {% if post.likes.count > 0 %}
+                  <span class="filled-thumb" style="color: yellow;">👍</span>
+                {% else %}
+                  <span class="empty-thumb" style="color: white;">👍</span>
+                {% endif %}
+              </span>
+              <span class="ml-2">{{ post.likes.count }} Likes</span>
             </div>
           </li>
         {% endfor %}

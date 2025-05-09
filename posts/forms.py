@@ -2,6 +2,9 @@
 from django import forms
 from .models import Post
 
+from .models import Comment
+
+
 class PostForm(forms.ModelForm):
     class Meta:
         model = Post
@@ -26,3 +29,13 @@ class PostForm(forms.ModelForm):
         if len(title) < 5:
             raise forms.ValidationError('Заголовок должен содержать минимум 5 символов.')
         return title
+
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['text']  # Комментарий состоит только из текста
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['text'].widget.attrs.update({'placeholder': 'Write a comment...'})

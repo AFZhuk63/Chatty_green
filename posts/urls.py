@@ -1,14 +1,13 @@
 from django.urls import path
 from . import views
-from .views import PostUpdateView, PostDeleteView
-from .views import PostCreateView
+from .views import PostUpdateView, PostDeleteView, PostCreateView, PostDetailView
 
 urlpatterns = [
-    path('', views.PostListView.as_view(), name='post_list'),                       # Список постов
-    path('create/', views.PostCreateView.as_view(), name='post_create'),                # Страница создания поста
-    # path('posts/<int:pk>/', views.PostDetailView.as_view(), name='post_detail_by_id'),
-    # path('posts/<int:post_id>/', views.post_detail, name='post_detail'),
-    path('<slug:slug>/', views.PostDetailView.as_view(), name='post_detail'),     # Страница детали поста
-    path('<slug:slug>/edit/', views.PostUpdateView.as_view(), name='post_edit'),       # Страница редактирования поста
-    path('<slug:slug>/delete/', views.PostDeleteView.as_view(), name='post_delete'),    # Страница удаления поста
+    path('', views.PostListView.as_view(), name='post_list'),                        # Список постов
+    path('create/', PostCreateView.as_view(), name='post_create'),                   # Создание поста
+    path('<slug:slug>/edit/', PostUpdateView.as_view(), name='post_edit'),           # Редактирование
+    path('<slug:slug>/delete/', PostDeleteView.as_view(), name='post_delete'),       # Удаление
+    path('<slug:slug>/like/', views.like_post, name='like_post'),                    # AJAX-лайк
+    path('<slug:slug>/', PostDetailView.as_view(), name='post_detail'),              # Детали поста (в конце!)
 ]
+

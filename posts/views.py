@@ -1,33 +1,25 @@
-from django.shortcuts import render, get_object_or_404
-from .models import Post
-from django.views.generic import ListView, DetailView
-from django.views.generic import UpdateView, DeleteView
+from django.shortcuts import render, get_object_or_404, redirect
+from django.http import JsonResponse, HttpResponseForbidden
+from .models import Post, Comment
+from .forms import CommentForm, PostForm
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
 
-from django.views.generic import CreateView
-from .forms import PostForm
 
-
+# Классы для работы с Post
 class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post
     form_class = PostForm
     template_name = 'posts/post_form.html'
-    success_url = reverse_lazy('post_list')  # или на detail по slug, на выбор
+    success_url = reverse_lazy('post_list')
 
     def form_valid(self, form):
         form.instance.author = self.request.user
         return super().form_valid(form)
-
-def post_list(request):
-    posts = Post.objects.all()
-    return render(request, 'posts/post_list.html', {'posts': posts})
-
-
-# def post_detail_by_slag(request, slug): # исправить slag → slug (если это ошибка и создан не намеренно):
-#     post = get_object_or_404(Post, slug=slug)
-#     return render(request, 'posts/post_detail.html', {'post': post})
-
 
 class PostListView(ListView):
     model = Post
@@ -35,11 +27,12 @@ class PostListView(ListView):
     context_object_name = 'posts'
     paginate_by = 20
 
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        # Передаем количество лайков для каждого поста
+        for post in context['posts']:
+            post.likes_count = post.likes.count()
         return context
-
 
 class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Post
@@ -50,7 +43,6 @@ class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         post = self.get_object()
         return self.request.user == post.author
 
-
 class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Post
     success_url = reverse_lazy('post_list')
@@ -60,12 +52,50 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         post = self.get_object()
         return self.request.user == post.author
 
-
+# Детали поста с формой комментариев (CBV)
 class PostDetailView(DetailView):
     model = Post
     template_name = 'posts/post_detail.html'
     context_object_name = 'post'
 
-    def get_object(self, queryset=None):
-        # Получаем объект Post по slug
-        return Post.objects.get(slug=self.kwargs['slug'])
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['comments'] = self.object.comments.all()
+        context['form'] = CommentForm()
+        return context
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        form = CommentForm(request.POST)
+        if form.is_valid() and request.user.is_authenticated:
+            comment = form.save(commit=False)
+            comment.post = self.object
+            comment.author = request.user
+            comment.save()
+            return redirect('post_detail', slug=self.object.slug)
+
+        context = self.get_context_data()
+        context['form'] = form
+        return self.render_to_response(context)
+
+
+@login_required
+@require_POST
+def like_post(request, slug):
+    if not request.user.is_authenticated:
+        return HttpResponseForbidden("You must be logged in to like a post.")
+
+    post = get_object_or_404(Post, slug=slug)
+    user = request.user
+
+    if user in post.likes.all():
+        post.likes.remove(user)
+        liked = False
+    else:
+        post.likes.add(user)
+        liked = True
+
+    return JsonResponse({
+        'liked': liked,
+        'likes_count': post.likes.count()
+    })
