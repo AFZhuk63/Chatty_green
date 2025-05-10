@@ -1,14 +1,19 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Post List</title>
-</head>
-<body>
-    <h1>Post List</h1>
-    <ul>
+
+{% extends 'base.html' %}
+{% block title %}Каталог постов Chatty-green{% endblock %}
+
+{% block content %}
+<h1 class="text-center mb-4"> Каталог постов Chatty-green  </h1>
+   {% comment %} {% include "include/search_form.html" %} {% endcomment %}
+    <h1 class="text-center mb-4"></h1>
+
+    <div class="row">
+        {% comment %} {% include "include/paginator.html" with page=page_obj %} {% endcomment %}
+
         {% for post in posts %}
-            <li><a href="{% url 'post_detail' post.slug %}">{{ post.text|truncatewords:30 }}</a> by {{ post.author.username }}</li>
+            {% include "include/post_preview.html" with post=post %}
         {% endfor %}
-    </ul>
-</body>
-</html>
+
+         {% comment %} {% include "include/paginator.html" with page=page_obj %} {% endcomment %}
+    </div>
+{% endblock %}

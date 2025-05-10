@@ -18,17 +18,20 @@ class PostListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
         return context
 
-class PostDetailView(DetailView):
+class PostDetailViewSlug(DetailView):
     model = Post
     template_name = 'post_detail.html'
     context_object_name = 'post'
+    slug_field = 'slug'  # Поле модели для поиска по слагу
+    slug_url_kwarg = 'slug'  # Название параметра в URL
 
-    def get(self, request, *args, **kwargs):
-        response = super().get(request, *args, **kwargs)
-        return response
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        return context
+class PostDetailViewId(DetailView):
+    model = Post
+    template_name = 'post_detail.html'  # Можно использовать тот же шаблон
+    context_object_name = 'post'
+    pk_field = 'pk'
+    pk_url_kwarg = 'pk'  # Явное указание параметра URL
+    print(f'pk_url_kwarg = {pk_url_kwarg}')
