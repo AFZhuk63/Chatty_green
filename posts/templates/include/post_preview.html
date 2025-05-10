@@ -1,0 +1,12 @@
+
+<div class="card card-shadow">
+    <div class="card-body">
+        <h5 class="card-title"> Пост:  #{{ post.id }}</h5>
+        <p class="card-text">{{ post.text|truncatewords:7 }}</p>
+
+        <p class="card-text d-flex justify-content-between">
+            <small class="text-muted"><i class="bi bi-calendar"></i> Дата публикации:  {{ post.publication_date }}</small>
+        </p>
+         <p class="card-text"><i class="bi bi-person-fill"></i> Автор поста: {{ post.author|default:'Аноним' }}</p>
+    </div>
+</div>
