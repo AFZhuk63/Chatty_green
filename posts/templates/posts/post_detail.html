@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ post.title }}{% endblock %}
+
+{% block content %}
+  <div class="container mt-4">
+    <h2>{{ post.title|default:"(Без заголовка)" }}</h2>
+    <p><strong>Автор:</strong> {{ post.author.username }}</p>
+    <p><strong>Дата публикации:</strong> {{ post.publication_date|date:"d M Y H:i" }}</p>
+
+    <!-- Проверяем, загружено ли изображение -->
+    {% if post.image %}
+      <img src="{{ post.image.url }}" alt="Изображение поста" class="img-fluid my-3">
+    {% endif %}
+
+    <p>{{ post.text }}</p>
+
+    <hr>
+
+    <!-- Кнопка редактирования (только для автора поста) -->
+    {% if user == post.author %}
+      <a href="{% url 'post_update' post.slug %}" class="btn btn-warning mt-3">✏️ Редактировать</a>
+    {% endif %}
+
+    <h3>Комментарии</h3>
+    <ul>
+      {% for comment in post.comments.all %}
+        <li><strong>{{ comment.author.username }}</strong>: {{ comment.text }}</li>
+      {% empty %}
+        <li>Комментариев пока нет.</li>
+      {% endfor %}
+    </ul>
+
+    <!-- Форма для добавления нового комментария -->
+    <h4>Оставить комментарий:</h4>
+    {% if user.is_authenticated %}
+    <form method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit" class="btn btn-primary mt-2">Добавить</button>
+    </form>
+    {% else %}
+  <p class="text-danger">Пожалуйста, нажмите кнопку <a href="{% url 'login' %}">войти</a>, чтобы оставить комментарий.</p>
+    {% endif %}
+    <a href="{% url 'post_list' %}" class="btn btn-secondary mt-3">Назад</a>
+  </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.getElementById('like-button').addEventListener('click', function () {
+    fetch("{% url 'like_post' post.slug %}", {
+      method: "POST",
+      headers: {
+        'X-CSRFToken': '{{ csrf_token }}',
+        'X-Requested-With': 'XMLHttpRequest',
+      },
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data) {
+        document.getElementById('like-count').textContent = data.likes_count;
+        document.getElementById('like-icon').innerHTML = data.liked ? '👍' : '<span style="color: white;">👍</span>';
+        document.getElementById('dislike-icon').innerHTML = '<span style="color: white;">👎</span>';
+      }
+    });
+  });
+
+  document.getElementById('dislike-button').addEventListener('click', function () {
+    fetch("{% url 'dislike_post' post.slug %}", {
+      method: "POST",
+      headers: {
+        'X-CSRFToken': '{{ csrf_token }}',
+        'X-Requested-With': 'XMLHttpRequest',
+      },
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data) {
+        document.getElementById('dislike-count').textContent = data.dislikes_count;
+        document.getElementById('dislike-icon').innerHTML = data.disliked ? '👎' : '<span style="color: white;">👎</span>';
+        document.getElementById('like-icon').innerHTML = '<span style="color: white;">👍</span>';
+      }
+    });
+  });
+</script>
+{% endblock %}

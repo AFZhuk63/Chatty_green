@@ -1,15 +1,30 @@
-{% extends "base.html" %}
+{% extends "base.html" %} <!-- Будет искать в templates/base.html -->
 
 {% block title %}Главная - Chatty{% endblock %}
 
 {% block content %}
-    {% if user.is_authenticated %}
-        <h1>Привет, {{ user.username }}!</h1>
-        <p>Рады видеть тебя снова! 🎉</p>
-        <a href="{% url 'feed' %}" class="btn btn-primary">Перейти в ленту</a>
-    {% else %}
-        <h1>Добро пожаловать в Chatty!</h1>
-        <p>Присоединяйся и общайся с другими пользователями!</p>
-        <a href="{% url 'login' %}" class="btn btn-secondary">Войти</a>
-    {% endif %}
+  <style>
+    body {
+      opacity: 0;
+      transition: opacity 2s ease-in;
+    }
+
+    body.fade-in {
+      opacity: 1;
+    }
+  </style>
+
+  <div style="background-color: rgba(255, 255, 255, 0.9); padding: 20px; border-radius: 10px;">
+      <h1>Добро пожаловать в Chatty Green!</h1>
+      <p>Лучший чат для социальных новостей  .</p>
+          <a href="{% url 'post_list' %}">
+            <button type="submit" class="btn btn-primary">Перейти в чат</button>
+          </a>
+  </div>
+
+  <script>
+    window.addEventListener('load', function () {
+      document.body.classList.add('fade-in');
+    });
+  </script>
 {% endblock %}

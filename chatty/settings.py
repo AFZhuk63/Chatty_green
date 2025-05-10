@@ -11,10 +11,18 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import os
+from dotenv import load_dotenv
+
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(BASE_DIR / '.env')  # Явное указание пути
 
+env_path = BASE_DIR / '.env'
+if not env_path.exists():
+    print(f"\n⚠️ Внимание: файл .env не найден по пути: {env_path}\n")
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
@@ -22,11 +30,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-n=s5kr%x^h$7ur^*wwt6skj&pn$wm49##$9a)prz8_nv4nd09t'
 
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'web']  # 'web' - имя сервиса в docker-compose
 
 # Application definition
 
@@ -38,12 +46,23 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'django.contrib.sites',
+
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.github',
+
     # Наши приложения
     'users',
     'posts',
     'subscriptions',
     'core',
+    'chat',
+    'widget_tweaks',
 ]
+
+SITE_ID = 1
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -53,6 +72,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
+
 ]
 
 ROOT_URLCONF = 'chatty.urls'
@@ -60,7 +82,10 @@ ROOT_URLCONF = 'chatty.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / "templates"],
+        'DIRS': [
+            os.path.join(BASE_DIR, 'templates'),  # для общей папки templates
+            os.path.join(BASE_DIR, 'users/templates'),  #  это для папки с шаблонами пользователей
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -68,23 +93,34 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
+            'libraries': {},
+            'builtins': [],
         },
     },
 ]
 
 WSGI_APPLICATION = 'chatty.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
+"""DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
-}
+}"""
 
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('PG_NAME'),
+        'USER': os.getenv('PG_USER'),
+        'PASSWORD': os.getenv('PG_PASSWORD'),
+        'HOST': os.getenv('PG_HOST'),
+        'PORT': os.getenv('PG_PORT'),
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -104,25 +140,71 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# Authentication
+AUTH_USER_MODEL = 'users.CustomUser'
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
-
+LANGUAGE_CODE = 'ru-ru'
 TIME_ZONE = 'UTC'
-
-USE_I18N = True
-
+USE_L10N = True  # включить локализацию чисел и дат
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'  # для collectstatic
+STATICFILES_DIRS = [BASE_DIR / 'static']  # дополнительные папки со статикой
+
+# Email settings (после загрузки переменных окружения)
+# Email configuration (adapted for existing .env)
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = os.environ['EMAIL_HOST']  # Обязательная переменная
+EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 587))  # 587 по умолчанию
+EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True') == 'True'  # True по умолчанию
+EMAIL_HOST_USER = os.environ['EMAIL_HOST_USER']  # Обязательная переменная
+EMAIL_HOST_PASSWORD = os.environ['EMAIL_HOST_PASSWORD']  # Используем основной пароль из .env
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER)  # fallback на EMAIL_HOST_USER
+
+# Правильная валидация (используем os.getenv() напрямую)
+if not os.getenv('EMAIL_HOST_USER') or not os.getenv('EMAIL_HOST_PASSWORD'):
+    raise ValueError(
+        "Требуемые переменные окружения не найдены:\n"
+        f"EMAIL_HOST_USER: {'не установлен' if not os.getenv('EMAIL_HOST_USER') else 'OK'}\n"
+        f"EMAIL_HOST_PASSWORD: {'не установлен' if not os.getenv('EMAIL_HOST_PASSWORD') else 'OK'}\n"
+        "Проверьте файл .env в корне проекта"
+    )
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Создаем папку media если не существует
+if not os.path.exists(MEDIA_ROOT):
+    os.makedirs(MEDIA_ROOT)
+
+# URL для входа
+#LOGIN_URL = 'home'  # Используем имя нашего URL-пути для входа на домашнюю страницу
+#LOGIN_REDIRECT_URL = '/home/' # Куда перенаправляет после успешного входа
+LOGIN_REDIRECT_URL = '/posts/'  # ✅ Гарантирует, что после входа пользователя отправят на /posts/
+
+LOGIN_URL = '/accounts/login/'  # Страница входа
+
+
+
+
+# Проверка загрузки переменных окружения
+# print("\n=== Email Configuration ===")
+# print(f"EMAIL_HOST: {EMAIL_HOST}")
+# print(f"EMAIL_PORT: {EMAIL_PORT}")
+# print(f"EMAIL_USE_TLS: {EMAIL_USE_TLS}")
+# print(f"EMAIL_HOST_USER: {EMAIL_HOST_USER or 'не установлен'}")
+# print(f"EMAIL_HOST_PASSWORD: {'установлен' if EMAIL_HOST_PASSWORD else 'не установлен'}")
+# print(f"DEFAULT_FROM_EMAIL: {DEFAULT_FROM_EMAIL}")
+# print("=========================\n")
