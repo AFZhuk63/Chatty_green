@@ -38,7 +38,8 @@ class PostListView(ListView):
 
 class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Post
-    fields = ['text', 'image']
+    form_class = PostForm
+    #fields = ['text', 'image']
     template_name = 'posts/post_form.html'
 
     def test_func(self):
@@ -62,8 +63,8 @@ class PostDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['comments'] = self.object.comments.all()
-        context['form'] = CommentForm()
+        context['comments'] = self.object.comments.all() # Подключаем комментарии
+        context['form'] = CommentForm() # Форма для новых комментариев
         return context
 
     def post(self, request, *args, **kwargs):
