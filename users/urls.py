@@ -2,7 +2,11 @@ from django.urls import path
 from django.contrib.auth import views as auth_views
 from . import views
 from .views import CustomLoginView
+
 from django.urls import reverse_lazy
+
+from django.urls import path, include
+
 
 urlpatterns = [
     path('', views.welcome_view, name='welcome'),  # Приветственная страница
@@ -20,4 +24,6 @@ urlpatterns = [
     path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
     path('reset/done/', auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
     path('profile/<str:username>/edit/', views.edit_profile, name='edit_profile'),  # Добавлен путь для редактирования профиля
+
+
 ]
