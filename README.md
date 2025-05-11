@@ -588,12 +588,18 @@ DATABASES = {
 - Медиа-файлы (например, изображения для постов) хранятся в папке media/.
 
 # Важные команды для работы с Docker:
-1. Запуск контейнеров:
+1. Остановка и Запуск контейнеров:
 ``` 
-docker-compose up
+docker compose down (- остановка)
+docker compose up --build (запуск)
+docker compose restart web (запуск только web)
+
+
 ``` 
 2. Выполнение миграций:
 ``` 
+rm -rf posts/migrations
+docker-compose exec web python manage.py makemigrations posts
 docker-compose exec web python manage.py migrate
 ``` 
 # Заключение по разделу Sprint [2] создание постов
