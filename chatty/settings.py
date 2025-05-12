@@ -60,8 +60,6 @@ INSTALLED_APPS = [
     'users',
     'posts',
     'subscriptions',
-    'core',
-    'chat',
     'widget_tweaks',
 ]
 
