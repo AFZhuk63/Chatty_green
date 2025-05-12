@@ -3,6 +3,9 @@ from . import views
 from .views import PostUpdateView, PostDeleteView, PostCreateView, PostDetailView, like_post, dislike_post
 from django.views.generic import TemplateView
 from django.contrib.auth.views import LoginView
+from .views import FeedView
+
+
 urlpatterns = [
     path('', views.PostListView.as_view(), name='post_list'),                       # Список постов
     path('create/', views.PostCreateView.as_view(), name='post_create'),                # Страница создания поста
@@ -15,4 +18,5 @@ urlpatterns = [
     path('<slug:slug>/', PostDetailView.as_view(), name='post_detail'),#Этот маршрут позволяет просматривать посты по их `slug`.
     path('<slug:slug>/like/', like_post, name='like_post'),  #Этот маршрут обрабатывает лайк для поста.
     path('<slug:slug>/dislike/', dislike_post, name='dislike_post'),  # ✅ Должен быть этот маршрут!
+    path('feed/', FeedView.as_view(), name='feed'),
 ]
