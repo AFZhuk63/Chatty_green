@@ -10,6 +10,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
+from subscriptions.models import Subscription
 
 
 # Классы для работы с Post
@@ -143,3 +144,14 @@ class PostDetailViewId(DetailView):
     pk_field = 'pk'
     pk_url_kwarg = 'pk'  # Явное указание параметра URL
     print(f'pk_url_kwarg = {pk_url_kwarg}')
+class FeedView(LoginRequiredMixin, ListView):
+    model = Post
+    template_name = 'posts/feed.html'
+    context_object_name = 'posts'
+    paginate_by = 10 # Количество постов на одной странице
+
+    def get_queryset(self):
+        # Получаем список авторов, на которых подписан текущий пользователь
+        subscribed_authors = Subscription.objects.filter(subscriber=self.request.user).values_list('author', flat=True)
+        # Фильтруем посты только от этих авторов
+        return Post.objects.filter(author__in=subscribed_authors).order_by('-publication_date')
