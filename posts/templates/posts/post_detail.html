@@ -19,7 +19,7 @@
 
     <!-- Кнопка редактирования (только для автора поста) -->
     {% if user == post.author %}
-      <a href="{% url 'post_update' post.slug %}" class="btn btn-warning mt-3">✏️ Редактировать</a>
+      <a href="{% url 'posts:post_update' post.slug %}" class="btn btn-warning mt-3">✏️ Редактировать</a>
     {% endif %}
 
     <h3>Комментарии</h3>
@@ -40,16 +40,17 @@
       <button type="submit" class="btn btn-primary mt-2">Добавить</button>
     </form>
     {% else %}
-  <p class="text-danger">Пожалуйста, нажмите кнопку <a href="{% url 'login' %}">войти</a>, чтобы оставить комментарий.</p>
+  <p class="text-danger">Пожалуйста, нажмите кнопку <a href="{% url 'login:login' %}">войти</a>, чтобы оставить комментарий.</p>
     {% endif %}
-    <a href="{% url 'post_list' %}" class="btn btn-secondary mt-3">Назад</a>
+    <a href="{% url 'posts:post_list' %}" class="btn btn-secondary mt-3">Назад</a>
+
   </div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
   document.getElementById('like-button').addEventListener('click', function () {
-    fetch("{% url 'like_post' post.slug %}", {
+    fetch("{% url 'posts:like_post' post.slug %}", {
       method: "POST",
       headers: {
         'X-CSRFToken': '{{ csrf_token }}',
@@ -67,7 +68,7 @@
   });
 
   document.getElementById('dislike-button').addEventListener('click', function () {
-    fetch("{% url 'dislike_post' post.slug %}", {
+    fetch("{% url 'posts:dislike_post' post.slug %}", {
       method: "POST",
       headers: {
         'X-CSRFToken': '{{ csrf_token }}',
