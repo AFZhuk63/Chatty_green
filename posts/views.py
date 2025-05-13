@@ -1,4 +1,4 @@
-#posts/views.py
+# posts/views.py
 
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse, HttpResponseForbidden
@@ -8,7 +8,6 @@ from django.views.generic import ListView, CreateView, UpdateView, DeleteView, D
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 
 
@@ -17,11 +16,12 @@ class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post
     form_class = PostForm
     template_name = 'posts/post_form.html'
-    success_url = reverse_lazy('posts:post_list')
+    success_url = reverse_lazy('posts:post_list')  # ✅ FIX: добавлен namespace 'posts'
 
     def form_valid(self, form):
         form.instance.author = self.request.user
         return super().form_valid(form)
+
 
 class PostListView(ListView):
     model = Post
@@ -38,10 +38,10 @@ class PostListView(ListView):
             post.dislikes_users = post.dislikes.all()
         return context
 
+
 class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Post
     form_class = PostForm
-    #fields = ['text', 'image']
     template_name = 'posts/post_form.html'
 
     def test_func(self):
@@ -49,16 +49,18 @@ class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         return self.request.user == post.author
 
     def get_success_url(self):
-        return reverse_lazy('posts:post_detail', kwargs={'slug': self.object.slug})  # ✅ Добавляем namespace
+        return reverse_lazy('posts:post_detail', kwargs={'slug': self.object.slug})  # ✅ FIX: добавлен namespace 'posts'
+
 
 class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Post
-    success_url = reverse_lazy('post_list')
+    success_url = reverse_lazy('posts:post_list')  # ✅ FIX: добавлен namespace 'posts'
     template_name = 'posts/post_confirm_delete.html'
 
     def test_func(self):
         post = self.get_object()
         return self.request.user == post.author
+
 
 # Детали поста с формой комментариев (CBV)
 class PostDetailView(DetailView):
@@ -68,8 +70,8 @@ class PostDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['comments'] = self.object.comments.all() # Подключаем комментарии
-        context['form'] = CommentForm() # Форма для новых комментариев
+        context['comments'] = self.object.comments.all()
+        context['form'] = CommentForm()
         return context
 
     def post(self, request, *args, **kwargs):
@@ -80,7 +82,7 @@ class PostDetailView(DetailView):
             comment.post = self.object
             comment.author = request.user
             comment.save()
-            return redirect('post_list')
+            return redirect('posts:post_list')  # ✅ FIX: добавлен namespace 'posts'
 
         context = self.get_context_data()
         context['form'] = form
@@ -108,6 +110,7 @@ def like_post(request, slug):
         'likes_count': post.likes.count()
     })
 
+
 @require_POST
 def dislike_post(request, slug):
     if not request.user.is_authenticated:
@@ -122,24 +125,25 @@ def dislike_post(request, slug):
     else:
         post.dislikes.add(user)
         disliked = True
-        post.likes.remove(user)  # ❗ убираем лайк, если ставится дизлайк
+        post.likes.remove(user)
 
     return JsonResponse({
         'disliked': disliked,
         'dislikes_count': post.dislikes.count()
     })
 
+
 class PostDetailViewSlug(DetailView):
     model = Post
-    template_name = 'post_detail.html'
+    template_name = 'posts/post_detail.html'
     context_object_name = 'post'
-    slug_field = 'slug'  # Поле модели для поиска по слагу
-    slug_url_kwarg = 'slug'  # Название параметра в URL
+    slug_field = 'slug'
+    slug_url_kwarg = 'slug'
+
 
 class PostDetailViewId(DetailView):
     model = Post
-    template_name = 'post_detail.html'  # Можно использовать тот же шаблон
+    template_name = 'posts/post_detail.html'
     context_object_name = 'post'
     pk_field = 'pk'
-    pk_url_kwarg = 'pk'  # Явное указание параметра URL
-    print(f'pk_url_kwarg = {pk_url_kwarg}')
+    pk_url_kwarg = 'pk'

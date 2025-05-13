@@ -6,9 +6,9 @@ from django.urls import reverse
 from django.utils import timezone
 
 from django.contrib.auth import get_user_model
+from slugify import slugify  # заменяет django.utils.text.slugify
 
 User = get_user_model()
-
 
 
 class Post(models.Model):
@@ -23,7 +23,7 @@ class Post(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            base_slug = slugify(self.title) if self.title else 'post'
+            base_slug = slugify(self.title or 'post')
             slug = base_slug
             counter = 1
             while Post.objects.filter(slug=slug).exclude(pk=self.pk).exists():

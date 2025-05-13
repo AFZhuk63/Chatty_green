@@ -590,11 +590,24 @@ DATABASES = {
 # Важные команды для работы с Docker:
 1. Запуск контейнеров:
 ``` 
-docker-compose up
+docker-compose up 
+docker compose restart web
+docker compose down
+    Это:
+- пересоберёт образ web,
+- пересоздаст миграции,
+- применит их,
+- запустит сервер.
+
+
 ``` 
 2. Выполнение миграций:
 ``` 
-docker-compose exec web python manage.py migrate
+Полезные команды:
+docker compose exec web python manage.py makemigrations
+docker compose exec web python manage.py migrate
+docker compose exec web python manage.py showmigrations posts
+
 ``` 
 # Заключение по разделу Sprint [2] создание постов
 В проекте реализована базовая функциональность для создания, редактирования и удаления постов. 

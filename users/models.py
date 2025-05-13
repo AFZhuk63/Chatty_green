@@ -17,7 +17,7 @@ class UserProfile(models.Model):
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,  # Используем кастомную модель
         on_delete=models.CASCADE,
-        related_name='profile'
+        related_name='userprofile'
     )
 
     def __str__(self):
@@ -41,7 +41,15 @@ class CustomUser(AbstractUser):
     bio = models.TextField(blank=True, verbose_name="О себе")
     contacts = models.CharField(max_length=255, blank=True, verbose_name="Контакты")
 
+
     def __str__(self):
         return self.username
 
 
+#  расширенная модель профиля с фотографией
+class Profile(models.Model):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='customprofile'
+    )

@@ -12,8 +12,10 @@
 
     <form method="post" class="mt-4">
       {% csrf_token %}
-      <button type="submit" class="btn btn-danger">Да, удалить</button>
-      <a href="{% url 'posts:post_detail' object.slug %}" class="btn btn-secondary ms-2">Отмена</a>
+      <div class="d-flex justify-content-end gap-2 mt-4">
+      < <button type="submit" class="btn btn-primary">Да, удалить</button>
+      <a href="{% url 'posts:post_list' %}" class="btn btn-secondary">Отмена</a>
+      </div>
     </form>
   </div>
 {% endblock %}
