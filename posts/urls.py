@@ -5,11 +5,9 @@ from . import views
 from .views import PostListView
 from posts.views import archive_post
 
-
 app_name = 'posts'
 
 urlpatterns = [
-
     path('', views.PostListView.as_view(), name='post_list'),  # Список постов
     path('create/', views.PostCreateView.as_view(), name='post_create'),  # Создание поста
     path('<slug:slug>/', views.PostDetailView.as_view(), name='post_detail'),  # Детали поста

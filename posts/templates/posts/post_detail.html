@@ -21,13 +21,13 @@
     <hr>
 
     <!-- Кнопка редактирования (только для автора поста) -->
+
    {% if user == post.author %}
        <div class="d-flex gap-2 mt-3">
         <a href="{% url 'posts:post_update' post.slug %}" class="btn btn-sm btn-warning">✏️ Редактировать</a>
         <button class="btn btn-sm btn-danger" onclick="confirmDelete('{{ post.slug }}')">🗑️ Удалить</button>
   </div>
 {% endif %}
-
 
     <h3>Комментарии</h3>
     <ul>
