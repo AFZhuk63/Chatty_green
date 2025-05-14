@@ -5,7 +5,8 @@
 {% block content %}
   <div class="container mt-4">
     <h2>{{ post.title|default:"(Без заголовка)" }}</h2>
-    <p><strong>Автор:</strong> {{ post.author.username }}</p>
+    <p>Автор: <a href="{% url 'profile' username=post.author.username %}">{{ post.author.username }}</a></p>
+
     <p><strong>Дата публикации:</strong> {{ post.publication_date|date:"d M Y H:i" }}</p>
 
     <!-- Проверяем, загружено ли изображение -->
@@ -19,7 +20,7 @@
 
     <!-- Кнопка редактирования (только для автора поста) -->
     {% if user == post.author %}
-      <a href="{% url 'post_update' post.slug %}" class="btn btn-warning mt-3">✏️ Редактировать</a>
+      <a href="{% url 'posts:post_update' post.slug %}" class="btn btn-warning mt-3">✏️ Редактировать</a>
     {% endif %}
 
     <h3>Комментарии</h3>
@@ -42,14 +43,15 @@
     {% else %}
   <p class="text-danger">Пожалуйста, нажмите кнопку <a href="{% url 'login' %}">войти</a>, чтобы оставить комментарий.</p>
     {% endif %}
-    <a href="{% url 'post_list' %}" class="btn btn-secondary mt-3">Назад</a>
+    <a href="{% url 'posts:post_list' %}" class="btn btn-secondary mt-3">Назад</a>
+
   </div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
   document.getElementById('like-button').addEventListener('click', function () {
-    fetch("{% url 'like_post' post.slug %}", {
+    fetch("{% url 'posts:like_post' post.slug %}", {
       method: "POST",
       headers: {
         'X-CSRFToken': '{{ csrf_token }}',
@@ -67,7 +69,7 @@
   });
 
   document.getElementById('dislike-button').addEventListener('click', function () {
-    fetch("{% url 'dislike_post' post.slug %}", {
+    fetch("{% url 'posts:dislike_post' post.slug %}", {
       method: "POST",
       headers: {
         'X-CSRFToken': '{{ csrf_token }}',
