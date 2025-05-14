@@ -7,6 +7,12 @@ from posts.views import archive_post
 
 app_name = 'posts'
 
+from .views import PostUpdateView, PostDeleteView, PostCreateView, PostDetailView, like_post, dislike_post
+from django.views.generic import TemplateView
+from django.contrib.auth.views import LoginView
+from .views import FeedView
+
+
 urlpatterns = [
     path('', views.PostListView.as_view(), name='post_list'),  # Список постов
     path('create/', views.PostCreateView.as_view(), name='post_create'),  # Создание поста

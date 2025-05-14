@@ -11,7 +11,9 @@ urlpatterns = [
     path('accounts/', include('django.contrib.auth.urls')),
     path('', include('users.urls')),
     path('posts/', include('posts.urls', namespace='posts')),
-
+    path('', include('users.urls')),
+    #path('posts/', include('posts.urls')),# Включаем URL-адреса приложения posts
+    path('subscriptions/', include('subscriptions.urls', namespace='subscriptions')),# Включаем URL-адреса приложения subscriptions
 ]
 
 # Добавляем поддержку медиа-файлов (аватары, изображения и т.д.)
