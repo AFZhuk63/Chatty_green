@@ -163,4 +163,5 @@ def archive_post(request, slug):
 
 def home(request):
     latest_posts = Post.objects.filter(is_archived=False).order_by('-created_at')[:5]  # 5 свежих постов
+    print(f"🔍 Передача в шаблон: {latest_posts}")  # Проверяем консоль
     return render(request, 'home.html', {'latest_posts': latest_posts})
