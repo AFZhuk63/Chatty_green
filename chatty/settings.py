@@ -48,6 +48,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.humanize',
+
 
     'django.contrib.sites',
 
@@ -120,7 +122,11 @@ DATABASES = {
         'PASSWORD': os.getenv('PG_PASSWORD'),
         'HOST': os.getenv('PG_HOST'),
         'PORT': os.getenv('PG_PORT'),
+        'OPTIONS': {
+            'client_encoding': 'UTF8',
+        },
     }
+
 }
 
 # Password validation
@@ -149,6 +155,7 @@ AUTH_USER_MODEL = 'users.CustomUser'
 
 LANGUAGE_CODE = 'ru-ru'
 TIME_ZONE = 'UTC'
+USE_I18N = True
 USE_L10N = True  # включить локализацию чисел и дат
 USE_TZ = True
 

@@ -1,3 +1,4 @@
+# users/views.py
 from django.db.models import Count
 from django.shortcuts import render
 
@@ -28,8 +29,8 @@ def welcome_view(request):
 def home_view(request):
     return render(request, 'home.html')  # Загружаем основную страницу (base.html)
 
-def home(request):
-    return render(request, 'home.html')
+#def home(request):
+    #return render(request, 'home.html')
 
 
 def register(request):
@@ -128,17 +129,6 @@ def change_password(request):
     else:
         form = CustomPasswordChangeForm(user=request.user)
     return render(request, 'users/change_password.html', {'form': form})
-
-
-#class CustomLoginView(LoginView):
-    #template_name = 'users/login.html'  # Твой шаблон входа
-
-    #def get_success_url(self):
-        #return reverse('profile', kwargs={'username': self.request.user.username})
-
-
-from django.contrib.auth.views import PasswordResetConfirmView
-from django.urls import reverse_lazy
 
 
 class LoggingPasswordResetConfirmView(PasswordResetConfirmView):
