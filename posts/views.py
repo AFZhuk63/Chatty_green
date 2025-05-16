@@ -100,7 +100,7 @@ class PostDetailView(DetailView):
             comment.post = self.object
             comment.author = request.user
             comment.save()
-            return redirect('post_list')
+            return redirect('posts:post_list')
 
         context = self.get_context_data()
         context['form'] = form
@@ -165,7 +165,7 @@ class PostDetailViewId(DetailView):
     context_object_name = 'post'
     pk_field = 'pk'
     pk_url_kwarg = 'pk'  # Явное указание параметра URL
-    print(f'pk_url_kwarg = {pk_url_kwarg}')
+
 
 
 class FeedView(LoginRequiredMixin, ListView):

@@ -13,12 +13,9 @@ urlpatterns = [
     path('home/', home, name='home'), # Основная страница
     path('', include('users.urls')),  # ✅ Подключаем маршруты из `users/urls.py` регистрация, вход
     path('accounts/', include('django.contrib.auth.urls')), # Стандартные маршруты аутентификации Django
-
     path('posts/', include('posts.urls', namespace='posts')),# Маршруты приложения "posts" (управление публикациями)
-
     path('subscriptions/', include('subscriptions.urls', namespace='subscriptions')),# Маршруты приложения "subscriptions" (подписки пользователей)
     path('posts/search/', search_results, name='search'),  #  Поиск публикаций (функция `search_results`)
-
 
 ]
 
