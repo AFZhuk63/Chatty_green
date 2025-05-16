@@ -4,13 +4,9 @@ from django.urls import path
 from . import views
 from .views import PostListView
 from posts.views import archive_post
+from .views import search_results
 
 app_name = 'posts'
-
-from .views import PostUpdateView, PostDeleteView, PostCreateView, PostDetailView, like_post, dislike_post
-from django.views.generic import TemplateView
-from django.contrib.auth.views import LoginView
-from .views import FeedView
 
 
 urlpatterns = [
@@ -23,6 +19,7 @@ urlpatterns = [
     path('<slug:slug>/like/', views.like_post, name='like_post'),  # Лайк поста
     path('<slug:slug>/dislike/', views.dislike_post, name='dislike_post'),  # Дизлайк поста
     path('id/<int:pk>/', views.PostDetailViewId.as_view(), name='post_detail_id'),  # Детали поста по ID
+    path("search/", search_results, name="search"),  # ✅ Должен быть!  # ✅ Объявляем маршрут
 ]
 
 
