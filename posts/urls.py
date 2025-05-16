@@ -22,7 +22,8 @@ urlpatterns = [
     path('<slug:slug>/archive/', archive_post, name='archive_post'),
     path('<slug:slug>/like/', views.like_post, name='like_post'),  # Лайк поста
     path('<slug:slug>/dislike/', views.dislike_post, name='dislike_post'),  # Дизлайк поста
-    path('id/<int:pk>/', views.PostDetailViewId.as_view(), name='post_detail_id'),  # Детали поста по ID
+    path('id/<int:pk>/', views.PostDetailViewId.as_view(), name='post_detail_id'),     # Детали поста по ID
+    path('posts/<slug:slug>/', views.PostDetailView.as_view(), name='post_detail')
 ]
 
 
