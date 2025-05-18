@@ -9,6 +9,7 @@ from .views import search_view
 from posts.views import home  # импортируем наше представление
 
 urlpatterns = [
+
     path('admin/', admin.site.urls), #Панель администратора Djan
     path('home/', home, name='home'), # Основная страница
     path('', include('users.urls')),  # ✅ Подключаем маршруты из `users/urls.py` регистрация, вход
@@ -16,9 +17,6 @@ urlpatterns = [
     path('posts/', include('posts.urls', namespace='posts')),# Маршруты приложения "posts" (управление публикациями)
     path('subscriptions/', include('subscriptions.urls', namespace='subscriptions')),# Маршруты приложения "subscriptions" (подписки пользователей)
     path('search/', search_view, name='search'),  #  Поиск публикаций (функция `search_results`)
-
-
-
 ]
 
 # Добавляем поддержку медиа-файлов (аватары, изображения и т.д.)
