@@ -108,14 +108,14 @@ WSGI_APPLICATION = 'chatty.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-
-"""DATABASES = {
+"""
+DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
-}"""
-
+}
+"""
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -124,6 +124,9 @@ DATABASES = {
         'PASSWORD': os.getenv('PG_PASSWORD'),
         'HOST': os.getenv('PG_HOST'),
         'PORT': os.getenv('PG_PORT'),
+        'OPTIONS': {
+            'client_encoding': 'UTF8',
+        },
     }
 }
 

@@ -15,8 +15,11 @@ urlpatterns = [
 
     path('<slug:slug>/like/', views.toggle_like, name='like_post'),  # Лайк поста (только по slug)
     path('<slug:slug>/dislike/', views.dislike_post, name='dislike_post'),  # Дизлайк поста
+
     path('id/<int:pk>/', views.PostDetailViewId.as_view(), name='post_detail_id'),  # Детали поста по ID
     path("search/", search_results, name="search"),  # Поиск
+    path('posts/<slug:slug>/', views.PostDetailView.as_view(), name='post_detail')
+
 ]
 
 

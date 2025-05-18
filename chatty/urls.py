@@ -5,18 +5,18 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from . import views
-from .views import search_results
+from .views import search_view
+from posts.views import home  # импортируем наше представление
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('', include('users.urls')),  # ✅ Подключаем маршруты из `users/urls.py`
-    path('accounts/', include('django.contrib.auth.urls')),
-    path('', include('users.urls')),
-    path('posts/', include('posts.urls', namespace='posts')),
-    #path('posts/', include('posts.urls')),# Включаем URL-адреса приложения posts
-    path('subscriptions/', include('subscriptions.urls', namespace='subscriptions')),# Включаем URL-адреса приложения subscriptions
-    path('posts/search/', search_results, name='search'),  # ✅ Объявляем маршрут
 
+    path('admin/', admin.site.urls), #Панель администратора Djan
+    path('home/', home, name='home'), # Основная страница
+    path('', include('users.urls')),  # ✅ Подключаем маршруты из `users/urls.py` регистрация, вход
+    path('accounts/', include('django.contrib.auth.urls')), # Стандартные маршруты аутентификации Django
+    path('posts/', include('posts.urls', namespace='posts')),# Маршруты приложения "posts" (управление публикациями)
+    path('subscriptions/', include('subscriptions.urls', namespace='subscriptions')),# Маршруты приложения "subscriptions" (подписки пользователей)
+    path('search/', search_view, name='search'),  #  Поиск публикаций (функция `search_results`)
 ]
 
 # Добавляем поддержку медиа-файлов (аватары, изображения и т.д.)
