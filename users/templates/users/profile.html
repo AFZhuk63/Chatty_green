@@ -11,7 +11,7 @@
             <img src="{% if profile_user.avatar %}{{ profile_user.avatar.url }}{% else %}/media/avatars/default.png{% endif %}"
                  alt="Аватар" class="img-thumbnail" width="200">
         </div>
-        <div class="col-md-9">
+        <div class="d-flex flex-column gap-2">
             <p><strong>Email:</strong> {{ profile_user.email }}</p>
             <p><strong>О себе:</strong> {{ profile_user.bio|default:"Не указано" }}</p>
 
@@ -47,10 +47,11 @@
 
             <!-- Статистика подписок -->
             <p>
-                Подписчиков: <span id="subscribers-count">{{ profile_user.followers.count }}</span>
+                Подписчиков: <span id="subscribers-count">{{ profile_user.followers.count|default:"0" }}</span>
                 &nbsp;|&nbsp;
-                Подписок: {{ profile_user.subscriptions.count }}
+                Подписок: {{ profile_user.subscriptions.count|default:"0" }}
             </p>
+
 
             <!-- Дополнительно: вывод последних статей пользователя -->
             <div class="profile-posts mt-4">

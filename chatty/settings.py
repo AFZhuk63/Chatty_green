@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     # Наши приложения
     'users',
     'posts',
+    'ads',
     'subscriptions',
     'widget_tweaks',
 ]

@@ -2,7 +2,7 @@
 
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse, HttpResponseForbidden, HttpResponse
-from .models import Post, Comment
+from .models import Post, Comment, Advertisement
 from .forms import CommentForm, PostForm
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
 from django.urls import reverse_lazy
@@ -14,7 +14,8 @@ from subscriptions.models import Subscription
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from posts.templatetags import time_filters
 from django.db.models import Q
-
+from django.shortcuts import render
+from posts.models import Post
 
 # Классы для работы с Post
 class PostCreateView(LoginRequiredMixin, CreateView):
@@ -184,12 +185,9 @@ def archive_post(request, slug):
     return JsonResponse({'success': False})
 
 
-from django.shortcuts import render
-from posts.models import Post
-
 def home(request):
     # Выбираем 5 последних неархивированных постов, отсортированных по дате создания (от новых к старым)
-    latest_posts = Post.objects.filter(is_archived=False).order_by('-created_at')[:5]
+    latest_posts = Post.objects.filter(is_archived=False).order_by('-created_at')[:12]
     return render(request, 'home.html', {'latest_posts':  latest_posts})
 
 
@@ -209,3 +207,7 @@ def search_results(request):
     posts = Post.objects.filter(Q(title__icontains=query) | Q(text__icontains=query), is_archived=False)
 
     return render(request, "posts/search_results.html", {"posts": posts, "query": query})
+
+
+
+
