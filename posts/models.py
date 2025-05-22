@@ -1,3 +1,4 @@
+# posts/models.py
 from django.db import models
 from django.utils.text import slugify
 from django.conf import settings

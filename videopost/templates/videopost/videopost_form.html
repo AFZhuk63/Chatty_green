@@ -1,0 +1,67 @@
+{# videopost/templates/videopost/videopost_form.html #}
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+  {% if form.instance.pk %}
+    Редактировать видеопост
+  {% else %}
+    Создать видеопост
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+  <div class="container mt-4">
+    <h2>
+      {% if form.instance.pk %}Редактировать видеопост{% else %}Создать видеопост{% endif %}
+    </h2>
+
+    <form method="post" enctype="multipart/form-data" class="mt-3">
+      {% csrf_token %}
+
+      {# Ошибки формы #}
+      {% if form.errors %}
+        <div class="alert alert-danger">
+          <strong>Ошибка!</strong> Проверьте введённые данные.
+          <ul>
+            {% for field, errors in form.errors.items %}
+              {% for error in errors %}
+                <li><strong>{{ field }}</strong>: {{ error }}</li>
+              {% endfor %}
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+
+      {# Заголовок #}
+      <div class="mb-3">
+        {{ form.title.label_tag }}
+        {{ form.title }}
+      </div>
+
+      {# Описание видео #}
+      <div class="mb-3">
+        {{ form.description.label_tag }}
+        {{ form.description }}
+      </div>
+
+      {# Поле для ссылки на видео (video_url) #}
+      <div class="mb-3">
+        {{ form.video_url.label_tag }}
+        {{ form.video_url }}
+      </div>
+
+      {# Загрузка превью-изображения (thumbnail) #}
+      <div class="mb-3">
+        {{ form.thumbnail.label_tag }}
+        {{ form.thumbnail }}
+      </div>
+
+      {# Кнопки управления #}
+      <div class="d-flex justify-content-start mt-3">
+        <button type="submit" class="btn btn-primary me-2">💾 Сохранить</button>
+        <a href="{% url 'videopost:videopost_list' %}" class="btn btn-secondary">Отмена</a>
+      </div>
+    </form>
+  </div>
+{% endblock %}

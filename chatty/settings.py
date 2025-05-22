@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     'ads',
     'subscriptions',
     'widget_tweaks',
+    'videopost',
 ]
 
 SITE_ID = 1

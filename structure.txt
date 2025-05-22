@@ -8,11 +8,9 @@ Chatty_green/
 │   ├── forms.py
 │   ├── migrations/
 │   │   ├── 0001_initial.py
+│   │   ├── 0002_alter_advertisement_options_advertisement_video_and_more.py
 │   │   └── __init__.py
 │   ├── models.py
-│   ├── templates/
-│   │   └── ads/
-│   │       └── create_ad.html
 │   ├── urls.py
 │   └── views.py
 ├── chatty/
@@ -30,6 +28,8 @@ Chatty_green/
 ├── entrypoint.sh
 ├── manage.py
 ├── media/
+│   ├── ads/
+│   │   └── videos/
 │   ├── ads_images/
 │   ├── avatars/
 │   ├── post_images/
@@ -51,6 +51,8 @@ Chatty_green/
 │   │   ├── 0006_post_created_at.py
 │   │   ├── 0007_post_is_archived_post_updated_at.py
 │   │   ├── 0008_advertisement_post_advertisement.py
+│   │   ├── 0008_alter_post_slug.py
+│   │   ├── 0009_merge_20250522_0025.py
 │   │   └── __init__.py
 │   ├── models.py
 │   ├── templates/
@@ -74,6 +76,7 @@ Chatty_green/
 ├── requirements.txt
 ├── static/
 │   ├── css/
+│   │   ├── ads.css
 │   │   ├── base.css
 │   │   ├── home.css
 │   │   ├── interaction-buttons.css
@@ -154,4 +157,18 @@ Chatty_green/
 ├── venv/
 │   ├── Include/
 │   ├── Scripts/
+├── videopost/
+│   ├── __init__.py
+│   ├── admin.py
+│   ├── apps.py
+│   ├── forms.py
+│   ├── migrations/
+│   │   └── __init__.py
+│   ├── models.py
+│   ├── templates/
+│   │   └── videopost/
+│   │       ├── videopost_detail.html
+│   │       └── videopost_list.html
+│   ├── tests.py
+│   └── views.py
 └── wait-for-db.sh

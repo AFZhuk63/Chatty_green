@@ -1,0 +1,239 @@
+{# videopost/templates/videopost/videopost_detail.html #}
+
+{% extends 'base.html' %}
+{% load time_filters %}
+{% block title %}{{ videopost.title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2>{{ videopost.title|default:"(Без названия)" }}</h2>
+  <p>Автор:
+    <a href="{% url 'profile' username=videopost.author.username %}">
+      {{ videopost.author.username|capfirst }}
+    </a>
+  </p>
+
+  <p><strong>Дата публикации:</strong> {{ videopost.publication_date|date:"d M Y H:i" }}</p>
+  <p><strong>Создан:</strong> {{ videopost.created_at|ru_timesince }}</p>
+
+  <!-- Видео-плеер: локальное видео или YouTube iframe -->
+  {% if videopost.video_url and 'youtube' in videopost.video_url %}
+    <div class="ratio ratio-16x9 my-3">
+      <iframe class="w-100"
+              src="https://www.youtube.com/embed/{{ videopost.video_url|cut:'https://youtu.be/'|cut:'https://www.youtube.com/watch?v=' }}"
+              frameborder="0"
+              allowfullscreen></iframe>
+    </div>
+  {% elif videopost.video %}
+    <div class="ratio ratio-16x9 my-3">
+      <video controls class="w-100 rounded" preload="metadata">
+        <source src="{{ videopost.video.url }}" type="video/mp4">
+        Ваш браузер не поддерживает видео.
+      </video>
+    </div>
+  {% endif %}
+
+  <!-- Превью с кликом для открытия модального окна -->
+  {% if videopost.thumbnail %}
+    <img src="{{ videopost.thumbnail.url }}" alt="Превью видео" class="img-fluid my-3" style="cursor:pointer;" onclick="openVideoModal('{{ videopost.video.url }}')" />
+    <p>URL превью: {{ videopost.thumbnail.url }}</p>
+  {% else %}
+    <p>Превью не загружено</p>
+  {% endif %}
+
+  <!-- Описание видео -->
+  <p>{{ videopost.description|linebreaks }}</p>
+
+  <hr>
+
+  <!-- Лайки и дизлайки -->
+  <div class="d-flex gap-4 align-items-center mb-3">
+    <button class="btn btn-outline-primary like-btn" data-slug="{{ videopost.slug }}">
+      👍 <span class="like-count">{{ videopost.likes.count }}</span>
+    </button>
+    <button class="btn btn-outline-danger dislike-btn" data-slug="{{ videopost.slug }}">
+      👎 <span class="dislike-count">{{ videopost.dislikes.count }}</span>
+    </button>
+  </div>
+
+  <!-- Кнопки управления -->
+  {% if user == videopost.author %}
+    <div class="d-flex gap-2 mt-3">
+      <a href="{% url 'videopost:videopost_update' videopost.slug %}" class="btn btn-sm btn-warning">✏️ Редактировать</a>
+      <button class="btn btn-sm btn-danger" onclick="confirmDelete('{{ videopost.slug }}')">🗑️ Удалить</button>
+    </div>
+  {% endif %}
+
+  <!-- Комментарии с ответами -->
+  <div class="comments-section mt-5">
+    <h3>Комментарии</h3>
+
+    {% for comment in comments %}
+      <div class="comment mb-3 p-3 border rounded">
+        <strong>{{ comment.author.username|capfirst }}</strong> • <small class="text-muted">{{ comment.created_at|ru_timesince }}</small>
+        <p>{{ comment.text }}</p>
+
+        <!-- Ответы -->
+        <div class="replies ms-4">
+          {% for reply in comment.replies.all %}
+            <div class="reply mb-2 p-2 border rounded">
+              <strong>{{ reply.author.username|capfirst }}</strong> • <small class="text-muted">{{ reply.created_at|ru_timesince }}</small>
+              <p>{{ reply.text }}</p>
+            </div>
+          {% endfor %}
+        </div>
+
+        {% if user.is_authenticated %}
+          <form method="post" action="{% url 'videopost:reply_comment' comment.id %}">
+            {% csrf_token %}
+            <input type="text" name="text" placeholder="Ответить..." class="form-control mt-2" required>
+            <button type="submit" class="btn btn-sm btn-secondary mt-1">Ответить</button>
+          </form>
+        {% endif %}
+      </div>
+    {% empty %}
+      <p>Комментариев пока нет.</p>
+    {% endfor %}
+  </div>
+
+  <h4>Оставить комментарий:</h4>
+  {% if user.is_authenticated %}
+    {% if user.is_banned %}
+      <h2><strong>Ваш профиль забанен!</strong></h2>
+      <p><strong>Причина:</strong> {{ request.user.ban_reason }}</p>
+      <p><strong>Срок:</strong> {{ request.user.banned_until }}</p>
+    {% else %}
+
+      <div class="comment-box p-3">
+        <form method="post" class="d-flex flex-column gap-2">
+          {% csrf_token %}
+          <input type="hidden" name="post_id" value="{{ videopost.id }}">  <!-- Здесь теперь правильно -->
+          <textarea name="text" class="form-control comment-input" placeholder="Напишите комментарий..." rows="3" required></textarea>
+          <div class="d-flex gap-2">
+              <button type="submit" class="btn btn-action flex-grow-1">Добавить</button>
+              <a href="{% url 'videopost:videopost_list' %}" class="btn btn-action flex-grow-1">Назад</a>
+    </div>
+</form>
+
+      </div>
+    {% endif %}
+  {% else %}
+    <p class="text-danger">Пожалуйста, <a href="{% url 'login' %}">войдите</a>, чтобы оставить комментарий.</p>
+    <a href="{% url 'videopost:list' %}" class="btn btn-action mt-3">Назад</a>
+  {% endif %}
+</div>
+
+<!-- Модальное окно для просмотра видео -->
+<div class="modal fade" id="videoModal" tabindex="-1" aria-labelledby="videoModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="videoModalLabel">{{ videopost.title|default:"Видео" }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+      </div>
+      <div class="modal-body">
+        <video id="modalVideo" controls class="w-100" preload="metadata">
+          <source src="" type="video/mp4" />
+          Ваш браузер не поддерживает видео.
+        </video>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Подключение Bootstrap JS (если не подключено в base.html) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  // Функция открытия модального окна с видео
+  function openVideoModal(videoUrl) {
+    const video = document.getElementById('modalVideo');
+    const source = video.querySelector('source');
+
+    source.src = videoUrl;
+    video.load();
+
+    const modal = new bootstrap.Modal(document.getElementById('videoModal'));
+    modal.show();
+
+    const modalEl = document.getElementById('videoModal');
+    modalEl.addEventListener('hidden.bs.modal', () => {
+      video.pause();
+      video.currentTime = 0;
+    }, { once: true });
+  }
+
+  // Функция подтверждения удаления (оставлена без изменений)
+  async function confirmDelete(slug) {
+    const isConfirmed = confirm("Вы уверены, что хотите удалить этот видеопост?");
+    if (!isConfirmed) return;
+
+    try {
+      const response = await fetch(`/videopost/${slug}/archive/`, {
+        method: "POST",
+        headers: {
+          "X-CSRFToken": getCSRFToken(),
+          "X-Requested-With": "XMLHttpRequest",
+        },
+      });
+
+      const data = await response.json();
+      console.log("✅ Ответ сервера:", data);
+
+      if (data.success) {
+        alert("✅ Видеопост успешно удалён!");
+        window.location.href = "/videopost/";
+      } else {
+        alert("❌ Ошибка удаления видеопоста.");
+      }
+    } catch (error) {
+      console.error("❌ Ошибка при удалении:", error);
+      alert("❌ Ошибка при удалении видеопоста.");
+    }
+  }
+
+  // Функция получения CSRF токена
+  function getCSRFToken() {
+    let cookieValue = null;
+    document.cookie.split(";").forEach(cookie => {
+      const trimmed = cookie.trim();
+      if (trimmed.startsWith("csrftoken=")) {
+        cookieValue = decodeURIComponent(trimmed.split("=")[1]);
+      }
+    });
+    return cookieValue;
+  }
+
+  // Пример AJAX для лайков (можно расширить)
+  document.querySelectorAll('.like-btn, .dislike-btn').forEach(button => {
+    button.addEventListener('click', async () => {
+      const slug = button.getAttribute('data-slug');
+      const action = button.classList.contains('like-btn') ? 'like' : 'dislike';
+
+      try {
+        const response = await fetch(`/videopost/${slug}/${action}/`, {
+          method: 'POST',
+          headers: {
+            'X-CSRFToken': getCSRFToken(),
+            'X-Requested-With': 'XMLHttpRequest',
+          },
+        });
+        const data = await response.json();
+
+        if (data.success) {
+          // Обновляем счётчики лайков/дизлайков
+          const container = button.parentElement;
+          container.querySelector('.like-count').textContent = data.likes_count;
+          container.querySelector('.dislike-count').textContent = data.dislikes_count;
+        } else {
+          alert('Ошибка при отправке лайка/дизлайка');
+        }
+      } catch (error) {
+        alert('Ошибка сети');
+      }
+    });
+  });
+</script>
+{% endblock %}
