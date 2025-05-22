@@ -1,4 +1,4 @@
-<!-- posts/templates/posts/share.html" -->
+<!-- posts/templates/posts/share.html -->
 <div class="modal fade" id="shareModal" tabindex="-1" aria-labelledby="shareModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -20,7 +20,7 @@
             </select>
           </div>
           <div class="mb-3" id="contactInput"></div>
-          <input type="hidden" id="shareUrl">
+          <input type="hidden" id="shareUrl" />
         </div>
         <div class="modal-footer">
           <button type="submit" class="btn btn-primary">Отправить</button>
@@ -59,8 +59,10 @@
           <label for="phone" class="form-label">Номер телефона:</label>
           <input type="tel" class="form-control" id="phone" required>
         `;
-      } else {
+      } else if (platform === "facebook" || platform === "instagram") {
         contactInput.innerHTML = "<p class='text-muted'>Ссылка будет открыта в новой вкладке.</p>";
+      } else {
+        contactInput.innerHTML = "";
       }
     });
 
@@ -83,7 +85,12 @@
         alert("Instagram не поддерживает прямой шаринг. Скопируйте ссылку вручную.");
       }
 
-      bootstrap.Modal.getInstance(document.getElementById('shareModal')).hide();
+      // Скрыть модальное окно Bootstrap 5
+      const modalElement = document.getElementById('shareModal');
+      const modal = bootstrap.Modal.getInstance(modalElement);
+      if (modal) {
+        modal.hide();
+      }
     });
   });
 </script>

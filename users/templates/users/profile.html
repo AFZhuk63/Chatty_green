@@ -5,7 +5,7 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h2>Профиль {{ profile_user.username }}</h2>
+    <h2>Профиль {{ profile_user.username|capfirst }}</h2>
     <div class="row">
         <div class="col-md-3">
             <img src="{% if profile_user.avatar %}{{ profile_user.avatar.url }}{% else %}/media/avatars/default.png{% endif %}"
@@ -67,6 +67,25 @@
                     {% endfor %}
                 {% else %}
                     <p>Нет опубликованных статей.</p>
+                {% endif %}
+            </div>
+            <!-- 🔥 Новый блок: Вывод видео пользователя -->
+            <div class="profile-videos mt-5">
+                <h3>Видео</h3>
+                {% if user_videos %}
+                    {% for video in user_videos %}
+                        <div class="video-preview mb-3">
+                            <h4>
+                                <a href="{% url 'videopost:videopost_detail' video.slug %}">{{ video.title }}</a>
+                            </h4>
+                            {% if video.thumbnail %}
+                                <img src="{{ video.thumbnail.url }}" alt="Превью" class="img-fluid mb-2" style="max-width: 50px;">
+                            {% endif %}
+                            <p>{{ video.description|truncatechars:150 }}</p>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p>Нет опубликованных видео.</p>
                 {% endif %}
             </div>
 

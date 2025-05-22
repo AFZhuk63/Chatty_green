@@ -9,7 +9,7 @@
 
         <!-- 🔍 Поле поиска (Размещено по центру между Chatty и Главная) -->
         <form action="{% url 'search' %}" method="GET" class="d-flex justify-content-center flex-grow-1">
-            <div class="input-group" style="max-width: 1200px;">
+            <div class="input-group" style="max-width: 900px;">
                 <input type="text" name="q" class="form-control rounded-pill ps-4 text-left"
                        placeholder="🔍 Найти пост..." style="height: 32px;">
             </div>
@@ -21,7 +21,14 @@
 
             <li class="nav-item">
                 <a class="nav-link" href="{% url 'home' %}">Главная</a>
-           </li>
+            </li>
+            <li class="nav-item">
+                    <a class="nav-link" href="{% url 'posts:post_list' %}">Лента</a>
+            </li>
+
+            <li class="nav-item">
+                 <a class="nav-link" href="{% url 'videopost:videopost_list' %}">Видео</a>
+            </li>
 
             {% if user.is_authenticated %}
 
@@ -35,7 +42,7 @@
                         style="object-fit: cover; margin-right: 8px;"
                     />
 
-                    <a class="nav-link" href="{% url 'profile' username=user.username %}">{{ user.username }}</a>
+                    <a class="nav-link" href="{% url 'profile' username=user.username %}">{{ user.username|capfirst }}</a>
 
                 </li>
                 <li class="nav-item">

@@ -1,4 +1,4 @@
-<!-- posts/templates/posts/search_results.html -->
+<!-- videopost/templates/videopost/search_results.html -->
 
 {% extends "base.html" %}
 {% block title %}Результаты поиска{% endblock %}
@@ -7,14 +7,14 @@
 <div class="container mt-5">
     <h2>🔍 Результаты поиска для "{{ query }}"</h2>
 
-    {% if posts %}
+    {% if videoposts %}
         <ul class="list-group">
-            {% for post in posts %}
+            {% for videopost in videoposts %}
                 <li class="list-group-item">
-                    <a href="{% url 'posts:post_detail' post.slug %}" class="fw-bold">
-                        {{ post.title }}
+                    <a href="{% url 'videopost:videopost_detail' videopost.slug %}" class="fw-bold">
+                        {{ videopost.title }}
                     </a>
-                    <p class="small text-muted">{{ post.text|truncatewords:30 }}</p>
+                    <p class="small text-muted">{{ videopost.text|truncatewords:30 }}</p>
                 </li>
             {% endfor %}
         </ul>
