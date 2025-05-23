@@ -33,12 +33,17 @@
     </div>
   {% endif %}
 
-  <!-- Превью с кликом для открытия модального окна -->
-  {% if videopost.thumbnail %}
-    <img src="{{ videopost.thumbnail.url }}" alt="Превью видео" class="img-fluid my-3" style="cursor:pointer;" onclick="openVideoModal('{{ videopost.video.url }}')" />
-    <p>URL превью: {{ videopost.thumbnail.url }}</p>
-  {% else %}
-    <p>Превью не загружено</p>
+<!-- Превью видео при загрузке с плеером  -->
+
+  {% if videopost.video_url %}
+    <video id="my-video" class="video-js vjs-default-skin vjs-big-play-centered"
+       controls preload="auto" width="100%" height="500"
+       data-setup='{
+         "techOrder": ["html5", "youtube"],
+         "sources": [{ "type": "video/youtube", "src": "https://www.youtube.com/watch?v=Pi8KdmVbcFE" }],
+         "playbackRates": [0.5, 1, 1.25, 1.5, 2]
+       }'>
+</video>
   {% endif %}
 
   <!-- Описание видео -->
@@ -103,18 +108,16 @@
       <p><strong>Причина:</strong> {{ request.user.ban_reason }}</p>
       <p><strong>Срок:</strong> {{ request.user.banned_until }}</p>
     {% else %}
-
       <div class="comment-box p-3">
         <form method="post" class="d-flex flex-column gap-2">
           {% csrf_token %}
-          <input type="hidden" name="post_id" value="{{ videopost.id }}">  <!-- Здесь теперь правильно -->
+          <input type="hidden" name="post_id" value="{{ videopost.id }}">
           <textarea name="text" class="form-control comment-input" placeholder="Напишите комментарий..." rows="3" required></textarea>
           <div class="d-flex gap-2">
-              <button type="submit" class="btn btn-action flex-grow-1">Добавить</button>
-              <a href="{% url 'videopost:videopost_list' %}" class="btn btn-action flex-grow-1">Назад</a>
-    </div>
-</form>
-
+            <button type="submit" class="btn btn-action flex-grow-1">Добавить</button>
+            <a href="{% url 'videopost:videopost_list' %}" class="btn btn-action flex-grow-1">Назад</a>
+          </div>
+        </form>
       </div>
     {% endif %}
   {% else %}
@@ -123,49 +126,10 @@
   {% endif %}
 </div>
 
-<!-- Модальное окно для просмотра видео -->
-<div class="modal fade" id="videoModal" tabindex="-1" aria-labelledby="videoModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="videoModalLabel">{{ videopost.title|default:"Видео" }}</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
-      </div>
-      <div class="modal-body">
-        <video id="modalVideo" controls class="w-100" preload="metadata">
-          <source src="" type="video/mp4" />
-          Ваш браузер не поддерживает видео.
-        </video>
-      </div>
-    </div>
-  </div>
-</div>
 {% endblock %}
 
 {% block extra_js %}
-<!-- Подключение Bootstrap JS (если не подключено в base.html) -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
 <script>
-  // Функция открытия модального окна с видео
-  function openVideoModal(videoUrl) {
-    const video = document.getElementById('modalVideo');
-    const source = video.querySelector('source');
-
-    source.src = videoUrl;
-    video.load();
-
-    const modal = new bootstrap.Modal(document.getElementById('videoModal'));
-    modal.show();
-
-    const modalEl = document.getElementById('videoModal');
-    modalEl.addEventListener('hidden.bs.modal', () => {
-      video.pause();
-      video.currentTime = 0;
-    }, { once: true });
-  }
-
-  // Функция подтверждения удаления (оставлена без изменений)
   async function confirmDelete(slug) {
     const isConfirmed = confirm("Вы уверены, что хотите удалить этот видеопост?");
     if (!isConfirmed) return;
@@ -194,7 +158,6 @@
     }
   }
 
-  // Функция получения CSRF токена
   function getCSRFToken() {
     let cookieValue = null;
     document.cookie.split(";").forEach(cookie => {
@@ -206,7 +169,6 @@
     return cookieValue;
   }
 
-  // Пример AJAX для лайков (можно расширить)
   document.querySelectorAll('.like-btn, .dislike-btn').forEach(button => {
     button.addEventListener('click', async () => {
       const slug = button.getAttribute('data-slug');
@@ -223,7 +185,6 @@
         const data = await response.json();
 
         if (data.success) {
-          // Обновляем счётчики лайков/дизлайков
           const container = button.parentElement;
           container.querySelector('.like-count').textContent = data.likes_count;
           container.querySelector('.dislike-count').textContent = data.dislikes_count;
@@ -236,4 +197,5 @@
     });
   });
 </script>
+
 {% endblock %}

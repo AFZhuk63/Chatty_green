@@ -1,3 +1,4 @@
+// static/js/likes.js
 // Ожидаем полной загрузки DOM перед выполнением скрипта
 document.addEventListener("DOMContentLoaded", function () {
 

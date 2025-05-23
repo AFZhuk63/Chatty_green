@@ -31,6 +31,7 @@ class VideoPost(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
     video_url = models.URLField(blank=True, null=True)  # Ссылка на видео
+    video_file = models.FileField(upload_to='uploaded_videos/', blank=True, null=True)  # 👈 Добавлено для загрузки видео на сайт
     thumbnail = models.ImageField(upload_to='video_thumbnails/', null=True, blank=True)
     publication_date = models.DateTimeField(auto_now_add=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -48,6 +49,14 @@ class VideoPost(models.Model):
 
     def get_absolute_url(self):
         return reverse('videopost:videopost_detail', kwargs={'slug': self.slug})
+
+    def get_video_source(self):
+        """Возвращает ссылку на видеофайл или YouTube URL"""
+        return self.video_file.url if self.video_file else self.video_url
+
+    def is_youtube(self):
+        """Возвращает True, если используется ссылка YouTube"""
+        return self.video_url and "youtube.com" in self.video_url
 
 
 class VideoComment(models.Model):

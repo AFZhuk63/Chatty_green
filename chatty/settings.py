@@ -1,3 +1,4 @@
+# -- chatty/settings.py
 """
 Django settings for chatty project.
 
