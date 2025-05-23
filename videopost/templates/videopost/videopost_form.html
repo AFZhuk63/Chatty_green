@@ -1,4 +1,3 @@
-{# videopost/templates/videopost/videopost_form.html #}
 {% extends 'base.html' %}
 {% load static %}
 
@@ -49,12 +48,52 @@
       <div class="mb-3">
         {{ form.video_url.label_tag }}
         {{ form.video_url }}
+        <small class="text-muted">🔗 Укажите ссылку на видео (YouTube, Vimeo и т. д.)</small>
       </div>
+
+      {# Загрузка видеофайла (video_file) #}
+      <div class="mb-3">
+        {{ form.video_file.label_tag }}
+        {{ form.video_file }}
+        <small class="text-muted">📹 Рекомендуемый формат: MP4, AVI, MKV (до 500MB)</small>
+      </div>
+
+      {# Кнопка "Загрузить видео" #}
+      <div class="mb-3">
+        <label class="form-label">Загрузите видео на сайт:</label>
+        <input type="file" name="video_file" accept="video/mp4,video/avi,video/mkv" class="form-control">
+        <small class="text-muted">Максимальный размер: 500MB</small>
+      </div>
+
+      {# Показ текущего видеофайла, если уже загружено #}
+      {% if form.instance.video_file %}
+        <div class="mb-3">
+          <label class="form-label">Текущее видео:</label><br>
+          <video width="480" controls>
+            <source src="{{ form.instance.video_file.url }}" type="video/mp4">
+            Ваш браузер не поддерживает воспроизведение видео.
+          </video>
+        </div>
+      {% endif %}
 
       {# Загрузка превью-изображения (thumbnail) #}
       <div class="mb-3">
         {{ form.thumbnail.label_tag }}
         {{ form.thumbnail }}
+      </div>
+
+      {# Возрастной ценз #}
+      <div class="mb-3">
+        {{ form.age_rating.label_tag }}
+        {{ form.age_rating }}
+        <small class="text-muted">🔞 Выберите возрастной рейтинг видео (0+, 6+, 12+, 18+)</small>
+      </div>
+
+      {# Подтверждение авторства контента #}
+      <div class="mb-3">
+        <label class="form-label">✅ Подтверждение авторства</label>
+        <input type="checkbox" name="ownership_confirmation" required>
+        <small class="text-muted">Я подтверждаю, что имею право публиковать это видео и музыку.</small>
       </div>
 
       {# Кнопки управления #}

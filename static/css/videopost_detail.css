@@ -1,0 +1,5 @@
+/* --Настройка размеров player--*/
+.video-js {
+    width: 100% !important;
+    height: 500px !important;} /* Фиксируем высоту */
+
