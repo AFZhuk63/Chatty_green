@@ -13,7 +13,7 @@ from subscriptions.models import Subscription
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
 from django.views.decorators.http import require_GET
-
+# from .models import Subscription
 
 class VideoPostCreateView(LoginRequiredMixin, CreateView):
     model = VideoPost
@@ -91,8 +91,19 @@ class VideoPostDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        videopost = self.get_object()
         context['comments'] = self.object.comments.filter(parent__isnull=True)
         context['form'] = VideoCommentForm()
+               # --- ДОБАВЛЯЕМ is_subscribed ---
+        user = self.request.user
+        if user.is_authenticated and user != videopost.author:
+            from subscriptions.models import Subscription
+            context['is_subscribed'] = Subscription.objects.filter(
+                subscriber=user, author=videopost.author
+            ).exists()
+        else:
+            context['is_subscribed'] = False
+
         return context
 
     def post(self, request, *args, **kwargs):
@@ -262,3 +273,4 @@ def reply_comment(request, comment_id):
     )
 
     return redirect(parent_comment.post.get_absolute_url())
+

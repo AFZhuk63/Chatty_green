@@ -24,7 +24,15 @@
   <script src="https://unpkg.com/video.js/dist/video.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/videojs-youtube/dist/Youtube.min.js"></script>
   <script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
- </head>
+
+ <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    integrity="{{ FONT_AWESOME_INTEGRITY }}"
+    crossorigin="anonymous"
+  >
+
+</head>
 <body>
 {% include "include/navbar.html" %}
 
@@ -34,6 +42,12 @@
     {% block content %}
     {% endblock %}
   </main>
+</div>
+
+<!-- Cookie-согласие для анонимных пользователей -->
+<div id="cookie-banner" class="cookie-banner">
+  <p>Мы используем cookies для улучшения взаимодействия с сайтом. <a href="/privacy-policy/">Подробнее</a></p>
+  <button onclick="acceptCookies()">Принять</button>
 </div>
 
 {% include "include/footer.html" %}

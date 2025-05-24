@@ -7,13 +7,13 @@
 {% block content %}
 <div class="container mt-4">
   <h2>{{ videopost.title|default:"(Без названия)" }}</h2>
-  <p>Автор:
+  <!-- <p>Автор:
     <a href="{% url 'profile' username=videopost.author.username %}">
       {{ videopost.author.username|capfirst }}
     </a>
   </p>
 
-  <p><strong>Дата публикации:</strong> {{ videopost.publication_date|date:"d M Y H:i" }}</p>
+  <p><strong>Дата публикации:</strong> {{ videopost.publication_date|date:"d M Y H:i" }}</p>-->
   <p><strong>Создан:</strong> {{ videopost.created_at|ru_timesince }}</p>
 
   <!-- Видео-плеер: локальное видео или YouTube iframe -->
@@ -45,21 +45,62 @@
        }'>
 </video>
   {% endif %}
+ <p>
+<div class="d-flex justify-content-between align-items-center flex-wrap mb-3">
+
+  <!-- Автор и подписка -->
+  <div class="d-flex align-items-center gap-2">
+    <p class="author-text mb-0">
+      Автор:
+      <a href="{% url 'profile' username=videopost.author.username %}">
+        {{ videopost.author.username|capfirst }}
+      </a>
+    </p>
+    <!-- <button class="btn btn-sm btn-outline-primary like-btn" style="width: 150px;">🔔 Подписаться</button -->>
+
+    {# Форма подписки/отписки #}
+    {% if request.user.is_authenticated and request.user.username != videopost.author.username %}
+      <button
+        type="button"
+        class="btn btn-sm btn-outline-primary subscribe-button d-flex align-items-center"
+        style="width: 150px; height: 32px !important;"
+        data-username="{{ videopost.author.username }}"
+      >
+        <i class="fa-solid fa-bell me-1 text-warning"></i>
+        {% if is_subscribed %}
+          Отписаться
+        {% else %}
+          Подписаться
+        {% endif %}
+      </button>
+    {% endif %}
+
+  </div>
+
+
+  <!-- Лайки и дизлайки -->
+  <div class="d-flex align-items-center gap-2">
+    <button class="btn btn-sm btn-outline-primary like-btn" style="width: 60px; height: 32px !important;" data-slug="{{ videopost.slug }}">
+      👍 <span class="like-count">{{ videopost.likes.count }}</span>
+    </button>
+    <button class="btn btn-sm btn-outline-danger dislike-btn" style="width: 60px; height: 32px !important;"" data-slug="{{ videopost.slug }}">
+      👎 <span class="dislike-count">{{ videopost.dislikes.count }}</span>
+    </button>
+  </div>
+
+  <!-- Дата -->
+  <p class="date-text mb-0 text-muted small"><strong>Опубликовано:</strong> {{ videopost.publication_date|date:"d M Y H:i" }}</p>
+</div>
+
 
   <!-- Описание видео -->
   <p>{{ videopost.description|linebreaks }}</p>
 
   <hr>
 
-  <!-- Лайки и дизлайки -->
-  <div class="d-flex gap-4 align-items-center mb-3">
-    <button class="btn btn-outline-primary like-btn" data-slug="{{ videopost.slug }}">
-      👍 <span class="like-count">{{ videopost.likes.count }}</span>
-    </button>
-    <button class="btn btn-outline-danger dislike-btn" data-slug="{{ videopost.slug }}">
-      👎 <span class="dislike-count">{{ videopost.dislikes.count }}</span>
-    </button>
-  </div>
+
+
+
 
   <!-- Кнопки управления -->
   {% if user == videopost.author %}
