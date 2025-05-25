@@ -58,13 +58,6 @@
         <small class="text-muted">📹 Рекомендуемый формат: MP4, AVI, MKV (до 500MB)</small>
       </div>
 
-      {# Кнопка "Загрузить видео" #}
-      <div class="mb-3">
-        <label class="form-label">Загрузите видео на сайт:</label>
-        <input type="file" name="video_file" accept="video/mp4,video/avi,video/mkv" class="form-control">
-        <small class="text-muted">Максимальный размер: 500MB</small>
-      </div>
-
       {# Показ текущего видеофайла, если уже загружено #}
       {% if form.instance.video_file %}
         <div class="mb-3">

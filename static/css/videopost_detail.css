@@ -83,3 +83,13 @@
     height: 32px !important; /*высота (строго) */
     border-radius: .275rem; /*закругление краев кнопок */
 }
+
+video {
+    width: 45vw; /* % от ширины экрана встроенного videoplayer (не YouTube) */
+    height: auto;
+}
+
+.empty-description { /* Вставка пустой строки с настраиваемой высотой */
+    min-height: 8px; /* Минимальная высота блока */
+    display: block; /* Убеждаемся, что это блочный элемент */
+}

@@ -1,13 +1,13 @@
 # videopost/forms.py
 
 from django import forms
-from .models import VideoPost, VideoComment  # предполагается, что у тебя есть модель VideoComment
+from .models import VideoPost, VideoComment
 
 
 class VideoPostForm(forms.ModelForm):
     class Meta:
         model = VideoPost
-        fields = ['title', 'description', 'video_url', 'thumbnail']
+        fields = ['title', 'description', 'video_url', 'video_file', 'thumbnail']
         widgets = {
             'title': forms.TextInput(attrs={
                 'class': 'form-control',

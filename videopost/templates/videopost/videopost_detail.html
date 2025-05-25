@@ -1,29 +1,23 @@
-{# videopost/templates/videopost/videopost_detail.html #}
+<!-- videopost/templates/videopost/videopost_detail.html -->
 
 {% extends 'base.html' %}
+{% load youtube_tags %}
 {% load time_filters %}
+
 {% block title %}{{ videopost.title }}{% endblock %}
 
 {% block content %}
+
 <div class="container mt-4">
   <h2>{{ videopost.title|default:"(Без названия)" }}</h2>
-  <!-- <p>Автор:
-    <a href="{% url 'profile' username=videopost.author.username %}">
-      {{ videopost.author.username|capfirst }}
-    </a>
-  </p>
-
-  <p><strong>Дата публикации:</strong> {{ videopost.publication_date|date:"d M Y H:i" }}</p>-->
   <p><strong>Создан:</strong> {{ videopost.created_at|ru_timesince }}</p>
 
-  <!-- Видео-плеер: локальное видео или YouTube iframe -->
-  {% if videopost.video_url and 'youtube' in videopost.video_url %}
-    <div class="ratio ratio-16x9 my-3">
-      <iframe class="w-100"
-              src="https://www.youtube.com/embed/{{ videopost.video_url|cut:'https://youtu.be/'|cut:'https://www.youtube.com/watch?v=' }}"
-              frameborder="0"
-              allowfullscreen></iframe>
+  <!-- Видео-плеер: YouTube iframe или локальное видео -->
+  {% if videopost.video_url|is_youtube_url %}
+    <div class="video-container my-3">
+      {{ videopost.video_url|embed_youtube|safe }}
     </div>
+
   {% elif videopost.video %}
     <div class="ratio ratio-16x9 my-3">
       <video controls class="w-100 rounded" preload="metadata">
@@ -31,76 +25,72 @@
         Ваш браузер не поддерживает видео.
       </video>
     </div>
+
+  {% elif videopost.video_file %}
+    <video width="640" height="360" controls>
+      <source src="{{ videopost.video_file.url }}" type="video/mp4">
+      Ваш браузер не поддерживает воспроизведение видео.
+    </video>
+
+  {% elif videopost.video_url %}
+    <!-- Fallback: просто вставка iframe по URL, если это не YouTube -->
+    <div class="ratio ratio-16x9">
+      <iframe src="{{ videopost.video_url }}" title="Видео" allowfullscreen></iframe>
+    </div>
+
+  {% else %}
+    <p>Видео недоступно.</p>
   {% endif %}
 
-<!-- Превью видео при загрузке с плеером  -->
+<p class="empty-description"></p> <!-- Вставка пустой строки с настраиваемой высотой через css -->
 
-  {% if videopost.video_url %}
-    <video id="my-video" class="video-js vjs-default-skin vjs-big-play-centered"
-       controls preload="auto" width="100%" height="500"
-       data-setup='{
-         "techOrder": ["html5", "youtube"],
-         "sources": [{ "type": "video/youtube", "src": "https://www.youtube.com/watch?v=Pi8KdmVbcFE" }],
-         "playbackRates": [0.5, 1, 1.25, 1.5, 2]
-       }'>
-</video>
-  {% endif %}
- <p>
+
 <div class="d-flex justify-content-between align-items-center flex-wrap mb-3">
 
-  <!-- Автор и подписка -->
-  <div class="d-flex align-items-center gap-2">
-    <p class="author-text mb-0">
-      Автор:
-      <a href="{% url 'profile' username=videopost.author.username %}">
-        {{ videopost.author.username|capfirst }}
-      </a>
-    </p>
-    <!-- <button class="btn btn-sm btn-outline-primary like-btn" style="width: 150px;">🔔 Подписаться</button -->>
 
-    {# Форма подписки/отписки #}
-    {% if request.user.is_authenticated and request.user.username != videopost.author.username %}
-      <button
-        type="button"
-        class="btn btn-sm btn-outline-primary subscribe-button d-flex align-items-center"
-        style="width: 150px; height: 32px !important;"
-        data-username="{{ videopost.author.username }}"
-      >
-        <i class="fa-solid fa-bell me-1 text-warning"></i>
-        {% if is_subscribed %}
-          Отписаться
-        {% else %}
-          Подписаться
-        {% endif %}
+    <!-- Автор и подписка -->
+    <div class="d-flex align-items-center gap-2">
+      <p class="author-text mb-0">
+        Автор:
+        <a href="{% url 'profile' username=videopost.author.username %}">
+          {{ videopost.author.username|capfirst }}
+        </a>
+      </p>
+
+      {% if request.user.is_authenticated and request.user.username != videopost.author.username %}
+        <button
+          type="button"
+          class="btn btn-sm btn-outline-primary subscribe-button d-flex align-items-center"
+          data-username="{{ videopost.author.username }}"
+        >
+          <i class="fa-solid fa-bell me-1 text-warning"></i>
+          {% if is_subscribed %}
+            Отписаться
+          {% else %}
+            Подписаться
+          {% endif %}
+        </button>
+      {% endif %}
+    </div>
+
+    <!-- Лайки и дизлайки -->
+    <div class="d-flex align-items-center gap-2">
+      <button class="btn btn-sm btn-outline-primary like-btn" style="width: 60px; height: 32px !important;" data-slug="{{ videopost.slug }}">
+        👍 <span class="like-count">{{ videopost.likes.count }}</span>
       </button>
-    {% endif %}
+      <button class="btn btn-sm btn-outline-danger dislike-btn" style="width: 60px; height: 32px !important;" data-slug="{{ videopost.slug }}">
+        👎 <span class="dislike-count">{{ videopost.dislikes.count }}</span>
+      </button>
+    </div>
 
+    <!-- Дата -->
+    <p class="date-text mb-0 text-muted small"><strong>Опубликовано:</strong> {{ videopost.publication_date|date:"d M Y H:i" }}</p>
   </div>
-
-
-  <!-- Лайки и дизлайки -->
-  <div class="d-flex align-items-center gap-2">
-    <button class="btn btn-sm btn-outline-primary like-btn" style="width: 60px; height: 32px !important;" data-slug="{{ videopost.slug }}">
-      👍 <span class="like-count">{{ videopost.likes.count }}</span>
-    </button>
-    <button class="btn btn-sm btn-outline-danger dislike-btn" style="width: 60px; height: 32px !important;"" data-slug="{{ videopost.slug }}">
-      👎 <span class="dislike-count">{{ videopost.dislikes.count }}</span>
-    </button>
-  </div>
-
-  <!-- Дата -->
-  <p class="date-text mb-0 text-muted small"><strong>Опубликовано:</strong> {{ videopost.publication_date|date:"d M Y H:i" }}</p>
-</div>
-
 
   <!-- Описание видео -->
   <p>{{ videopost.description|linebreaks }}</p>
 
   <hr>
-
-
-
-
 
   <!-- Кнопки управления -->
   {% if user == videopost.author %}
@@ -110,7 +100,7 @@
     </div>
   {% endif %}
 
-  <!-- Комментарии с ответами -->
+  <!-- Здесь вмонтируем блок комментариев с ответами -->
   <div class="comments-section mt-5">
     <h3>Комментарии</h3>
 
