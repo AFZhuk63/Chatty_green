@@ -12,7 +12,7 @@
         <div class="card-body text-center">
           <p class="fw-bold">Текущий аватар</p>
           <img src="{% if user.avatar %}{{ user.avatar.url }}{% else %}/media/avatars/default.png{% endif %}"
-               alt="Аватар" class="img-fluid rounded-circle mb-3" style="max-width: 200px;">
+               alt="Аватар" class="iimg-fluid rounded-circle mb-3 avatar-frame" style="max-width: 200px;">
           <div class="mt-2">
             {{ form.avatar|add_class:"form-control visually-hidden" }}
             <label for="{{ form.avatar.id_for_label }}" class="btn btn-sm btn-outline-secondary">Изменить фото</label>

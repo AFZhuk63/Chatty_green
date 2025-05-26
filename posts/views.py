@@ -69,7 +69,7 @@ class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
 class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Post
-    success_url = reverse_lazy('post_list')
+    success_url = reverse_lazy('posts:post_list')
     template_name = 'posts/post_confirm_delete.html'
 
     def test_func(self):
@@ -97,7 +97,8 @@ class PostDetailView(DetailView):
             comment.post = self.object
             comment.author = request.user
             comment.save()
-            return redirect('posts:post_list')
+            return redirect('posts:post_list') # после добавления комментария пользователь перенаправляется на список постов, а не остаётся на том же посте.
+            # return redirect('posts:post_detail', slug=self.object.slug) # после добавления комментария пользователь остается на этой же странице
 
         context = self.get_context_data()
         context['form'] = form

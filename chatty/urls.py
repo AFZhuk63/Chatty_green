@@ -25,7 +25,7 @@ urlpatterns = [
     path('posts/', include('posts.urls', namespace='posts')),# Маршруты приложения "posts" (управление публикациями)
     path('subscriptions/', include('subscriptions.urls', namespace='subscriptions')),# Маршруты приложения "subscriptions" (подписки пользователей)
     path('search/', search_view, name='search'),  #  Поиск публикаций (функция `search_results`)
-    path('videoposts/', include('videopost.urls')),
+    path('videopost/', include('videopost.urls')),
 
 ]
 

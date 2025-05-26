@@ -2,7 +2,7 @@
 
 from django.urls import path
 from .views import reply_comment
-
+from . import views
 from .views import (
     VideoPostListView,
     VideoPostCreateView,
@@ -13,7 +13,7 @@ from .views import (
     VideoFeedView,
     archive_videopost,
     toggle_videolike,
-    dislike_videopost,
+    toggle_videodislike,
     search_video_results,
     videopost_api_detail,
     delete_videopost,
@@ -52,7 +52,7 @@ urlpatterns = [
     path('<slug:slug>/like/', toggle_videolike, name='like_videopost'),
 
     # 10. Дизлайк через AJAX
-    path('<slug:slug>/dislike/', dislike_videopost, name='dislike_videopost'),
+    path('<slug:slug>/dislike/', toggle_videodislike, name='dislike_videopost'),
 
     # 11. API-детали
     path('api/<slug:slug>/', videopost_api_detail, name='videopost_api_detail'),
@@ -65,9 +65,11 @@ urlpatterns = [
 
     # 14. Лайк/дизлайк через POST-запросы (альтернативный путь)
     path('video/<slug:slug>/like/', toggle_videolike, name='video_like'),
-    path('video/<slug:slug>/dislike/', dislike_videopost, name='video_dislike'),
+    path('video/<slug:slug>/dislike/', toggle_videodislike, name='video_dislike'),
 
     path('<slug:slug>/ajax-delete/', delete_videopost, name='ajax_delete_videopost'),
     path('comment/<int:comment_id>/reply/', reply_comment, name='reply_comment'),
+
+    path('share/', views.share_videopost, name='share_videopost'),
 
 ]

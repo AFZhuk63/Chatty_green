@@ -15,6 +15,7 @@ from django.db.models import Q
 from django.views.decorators.http import require_GET
 # from .models import Subscription
 
+
 class VideoPostCreateView(LoginRequiredMixin, CreateView):
     model = VideoPost
     form_class = VideoPostForm
@@ -30,7 +31,7 @@ class VideoPostCreateView(LoginRequiredMixin, CreateView):
 class VideoPostListView(ListView):
     model = VideoPost
     template_name = 'videopost/videopost_list.html'  # Исправлено название шаблона для единообразия
-    context_object_name = 'videoposts'
+    context_object_name = 'videopost'
     paginate_by = 5
 
     def get_queryset(self):
@@ -127,29 +128,49 @@ def toggle_videolike(request, slug):
     video = get_object_or_404(VideoPost, slug=slug)
     user = request.user
 
-    # Убираем дизлайк, если есть
-    if video.dislikes.filter(id=user.id).exists():
-        video.dislikes.remove(user)
-    # Добавляем лайк, если еще нет
-    if not video.likes.filter(id=user.id).exists():
+    if video.likes.filter(id=user.id).exists():
+        # Пользователь уже лайкнул — снимаем лайк
+        video.likes.remove(user)
+        liked = False
+    else:
+        # Снимаем дизлайк, если есть
+        if video.dislikes.filter(id=user.id).exists():
+            video.dislikes.remove(user)
+        # Добавляем лайк
         video.likes.add(user)
+        liked = True
 
-    return redirect(video.get_absolute_url())
+    return JsonResponse({
+        'success': True,
+        'liked': liked,
+        'likes_count': video.likes.count(),
+        'dislikes_count': video.dislikes.count(),
+    })
 
 @login_required
 @require_POST
-def dislike_videopost(request, slug):
+def toggle_videodislike(request, slug):
     video = get_object_or_404(VideoPost, slug=slug)
     user = request.user
 
-    # Убираем лайк, если есть
-    if video.likes.filter(id=user.id).exists():
-        video.likes.remove(user)
-    # Добавляем дизлайк, если еще нет
-    if not video.dislikes.filter(id=user.id).exists():
+    if video.dislikes.filter(id=user.id).exists():
+        # Пользователь уже дизлайкнул — снимаем дизлайк
+        video.dislikes.remove(user)
+        disliked = False
+    else:
+        # Снимаем лайк, если есть
+        if video.likes.filter(id=user.id).exists():
+            video.likes.remove(user)
+        # Добавляем дизлайк
         video.dislikes.add(user)
+        disliked = True
 
-    return redirect(video.get_absolute_url())
+    return JsonResponse({
+        'success': True,
+        'disliked': disliked,
+        'likes_count': video.likes.count(),
+        'dislikes_count': video.dislikes.count(),
+    })
 
 
 class VideoPostDetailViewId(DetailView):
@@ -162,7 +183,7 @@ class VideoPostDetailViewId(DetailView):
 class VideoFeedView(LoginRequiredMixin, ListView):
     model = VideoPost
     template_name = 'videopost/feed.html'
-    context_object_name = 'videoposts'
+    context_object_name = 'videopost'
     paginate_by = 10
 
     def get_queryset(self):
@@ -198,23 +219,23 @@ def delete_videopost(request, slug):
 
 def search_video_results(request):
     query = request.GET.get("q", "").strip()
-    videoposts = VideoPost.objects.filter(
+    videopost = VideoPost.objects.filter(
         Q(title__icontains=query) | Q(description__icontains=query),
         is_archived=False
     )
 
     # --- ДОПОЛНЕНИЕ ---
     # Добавлена пагинация для результатов поиска
-    paginator = Paginator(videoposts, 10)  # 10 на страницу
+    paginator = Paginator(videopost, 10)  # 10 на страницу
     page = request.GET.get('page')
 
     try:
-        videoposts_page = paginator.page(page)
+        videopost_page = paginator.page(page)
     except (PageNotAnInteger, EmptyPage):
-        videoposts_page = paginator.page(1)
+        videopost_page = paginator.page(1)
 
     return render(request, "videopost/search_results.html", {
-        "videoposts": videoposts_page,
+        "videopost": videopost_page,
         "query": query
     })
 
@@ -274,4 +295,44 @@ def reply_comment(request, comment_id):
 
     return redirect(parent_comment.post.get_absolute_url())
 
+from django.core.mail import send_mail
+from django.conf import settings
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse, HttpResponseBadRequest
+from django.views.decorators.http import require_POST
+import json
+
+
+@require_POST
+@login_required
+def share_videopost(request):
+    try:
+        data = json.loads(request.body)
+        platform = data.get('platform')
+        recipient = data.get('recipient')
+        url = data.get('url')
+
+        if platform != 'email':
+            return JsonResponse({'status': 'error', 'message': 'Поддерживается только email'}, status=400)
+
+        if not recipient or not url:
+            return JsonResponse({'status': 'error', 'message': 'Не указан email или ссылка'}, status=400)
+
+        subject = "Смотрите интересный пост!"
+        message = (
+            f"Пользователь {request.user.username} ({request.user.email}) "
+            f"поделился с вами ссылкой на пост:\n\n{url}"
+        )
+
+        send_mail(
+            subject=subject,
+            message=message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[recipient],
+        )
+
+        return JsonResponse({'status': 'success', 'message': 'Письмо отправлено!'})
+
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 

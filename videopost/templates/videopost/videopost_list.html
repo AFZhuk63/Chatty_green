@@ -1,6 +1,8 @@
 {# videopost/templates/videopost/videopost_list.html #}
 {% extends 'base.html' %}
 {% load static %}
+<script src="{% static 'js/likes.js' %}"></script>
+
 {% load humanize %}
 {% load time_filters %}
 
@@ -29,11 +31,11 @@
   </div>
 
   <!-- Список видео -->
-  {% if videoposts %}
+  {% if videopost %}
     {% include "include/paginator.html" with page=page_obj %}
 
     <div class="list-group">
-      {% for video in videoposts %}
+      {% for video in videopost %}
         <div id="video-{{ video.id }}" class="list-group-item py-3 d-flex gap-3 video-card">
           <!-- Превью видео -->
           <div class="flex-shrink-0">
@@ -56,20 +58,25 @@
             <p class="mb-2 text-muted small">{{ video.description|truncatewords:30 }}</p>
 
             <!-- Кнопки -->
+
+            <!-- Лайк -->
             <div class="d-flex justify-content-between text-muted small mt-2">
               <div class="d-flex gap-3 align-items-center">
-                <span class="like-button" data-slug="{{ video.slug }}" title="Нравится">
+                <span class="like-button" data-slug="{{ video.slug }}" data-type="videopost" title="Нравится">
                   👍 <span class="like-count">{{ video.likes.count }}</span>
                 </span>
 
-                <span class="dislike-button" data-slug="{{ video.slug }}" title="Не нравится">
+            <!-- Дизлайк -->
+                <span class="dislike-button" data-slug="{{ video.slug }}" data-type="videopost" title="Не нравится">
                   👎 <span class="dislike-count">{{ video.dislikes.count }}</span>
                 </span>
 
+            <!-- Комментарии -->
                 <a href="{% url 'videopost:videopost_detail' video.slug %}#comments" title="Комментарии">
                   <img src="{% static 'images/chat_18866235.png' %}" alt="Комментарии" width="16" height="16">
                 </a>
 
+            <!-- Поделиться -->
                 <span class="share-button" data-slug="{{ video.slug }}" data-bs-toggle="modal" data-bs-target="#shareModal" style="cursor: pointer;" title="Поделиться">
                   <img src="{% static 'images/share_8358780.png' %}" alt="Поделиться" width="16" height="16">
                 </span>
@@ -95,6 +102,7 @@
 {% block extra_js %}
   {% if user.is_authenticated %}
     <script src="{% static 'js/likes.js' %}"></script>
+
   {% endif %}
   {% include 'videopost/share.html' %}
 {% endblock %}
