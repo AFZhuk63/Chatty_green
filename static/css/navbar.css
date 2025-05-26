@@ -50,5 +50,10 @@
     background-color: #323333 !important;
 }
 
+/* В файле static/css/navbar.css */
+.navbar .form-control {
+    margin-top: auto;
+    margin-bottom: auto;
+}
 
 

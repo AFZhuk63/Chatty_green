@@ -7,33 +7,54 @@
 {% block title %}{{ videopost.title }}{% endblock %}
 
 {% block content %}
+<!-- Подключение CSS Video.js и темы -->
+<link href="https://unpkg.com/video.js@8.10.0/dist/video-js.min.css" rel="stylesheet" />
+<link href="https://unpkg.com/@videojs/themes@1.0.0/dist/city/index.css" rel="stylesheet" />
 
 <div class="container mt-4">
   <h2>{{ videopost.title|default:"(Без названия)" }}</h2>
   <p><strong>Создан:</strong> {{ videopost.created_at|ru_timesince }}</p>
 
-  <!-- Видео-плеер: YouTube iframe или локальное видео -->
-  {% if videopost.video_url|is_youtube_url %}
+  {% if videopost.video %}
+    <!-- Video.js плеер для локального видео -->
+    <video
+      id="my-video"
+      class="video-js vjs-theme-city vjs-fluid rounded"
+      controls
+      preload="auto"
+      playsinline
+      data-setup='{
+        "playbackRates": [0.5, 1, 1.25, 1.5, 2]
+      }'
+    >
+      <source src="{{ videopost.video.url }}" type="video/mp4" />
+      Ваш браузер не поддерживает видео.
+    </video>
+
+  {% elif videopost.video_file %}
+    <!-- Video.js плеер для загруженного файла -->
+    <video
+      id="my-video-Local"
+      class="video-js vjs-theme-city vjs-fluid rounded"
+      controls
+      preload="auto"
+      playsinline
+      data-setup='{
+        "playbackRates": [0.5, 1, 1.25, 1.5, 2]
+      }'
+    >
+      <source src="{{ videopost.video_file.url }}" type="video/mp4" />
+      Ваш браузер не поддерживает видео.
+    </video>
+
+  {% elif videopost.video_url|is_youtube_url %}
+    <!-- YouTube встроенный iframe -->
     <div class="video-container my-3">
       {{ videopost.video_url|embed_youtube|safe }}
     </div>
 
-  {% elif videopost.video %}
-    <div class="ratio ratio-16x9 my-3">
-      <video controls class="w-100 rounded" preload="metadata">
-        <source src="{{ videopost.video.url }}" type="video/mp4">
-        Ваш браузер не поддерживает видео.
-      </video>
-    </div>
-
-  {% elif videopost.video_file %}
-    <video width="640" height="360" controls>
-      <source src="{{ videopost.video_file.url }}" type="video/mp4">
-      Ваш браузер не поддерживает воспроизведение видео.
-    </video>
-
   {% elif videopost.video_url %}
-    <!-- Fallback: просто вставка iframe по URL, если это не YouTube -->
+    <!-- Fallback: iframe без YouTube -->
     <div class="ratio ratio-16x9">
       <iframe src="{{ videopost.video_url }}" title="Видео" allowfullscreen></iframe>
     </div>
@@ -41,6 +62,11 @@
   {% else %}
     <p>Видео недоступно.</p>
   {% endif %}
+</div>
+
+<!-- Подключение JS Video.js -->
+<script src="https://unpkg.com/video.js@8.10.0/dist/video.min.js"></script>
+
 
 <p class="empty-description"></p> <!-- Вставка пустой строки с настраиваемой высотой через css -->
 
