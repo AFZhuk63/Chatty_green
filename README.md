@@ -590,11 +590,19 @@ DATABASES = {
 # Важные команды для работы с Docker:
 1. Запуск контейнеров:
 ``` 
-docker-compose up
+- docker-compose down /остановка контейнера/
+- docker-compose build /запуск сборки контейнера/
+- docker-compose up -d /запуск контенера/
+- docker restart web /перезапуск контенера - web/
+или все вместе  
+- docker-compose down && docker-compose build && docker-compose up -d 
+
+
 ``` 
 2. Выполнение миграций:
 ``` 
-docker-compose exec web python manage.py migrate
+docker exec -it web python manage.py makemigrations
+docker exec -it web python manage.py migrate
 ``` 
 # Заключение по разделу Sprint [2] создание постов
 В проекте реализована базовая функциональность для создания, редактирования и удаления постов. 
@@ -602,3 +610,12 @@ docker-compose exec web python manage.py migrate
 развертывания и миграций.
 
 Проект использует Django для построения веб-приложения, PostgreSQL для хранения данных и Docker для контейнеризации.
+# Создание тестов. 
+Созданы тесты для тестирования создания и редактирования постов (post_create, post_update ) и
+Интеграционные тесты: регистрация → пост → комментарий в одном файле тестируется цепочка действий:
+регистрация пользователя, создание поста, добавление комментария, отображение поста.
+Тесты добавлен в docker-compose как service tests. 
+После обновления проекта нужно вначале сделать 
+docker-compose build а затем запустить тесты
+docker-compose run --rm tests.
+После прохождения тестов контейнер с тестами удалится и можно работать с проектом.
