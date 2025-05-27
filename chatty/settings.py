@@ -1,3 +1,4 @@
+# -- chatty/settings.py
 """
 Django settings for chatty project.
 
@@ -22,6 +23,8 @@ from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / '.env')  # Явное указание пути
+
+FONT_AWESOME_INTEGRITY = os.getenv("FONT_AWESOME_INTEGRITY")
 
 env_path = BASE_DIR / '.env'
 if not env_path.exists():
@@ -61,8 +64,10 @@ INSTALLED_APPS = [
     # Наши приложения
     'users',
     'posts',
+    'ads',
     'subscriptions',
     'widget_tweaks',
+    'videopost',
 ]
 
 SITE_ID = 1
