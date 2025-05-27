@@ -17,6 +17,13 @@ from django.urls import reverse
 from django.contrib.auth.views import PasswordResetConfirmView
 from django.urls import reverse_lazy
 
+
+def welcome_view(request):
+    return render(request, 'welcome.html')  # Загружаем welcome.html
+
+def home_view(request):
+    return render(request, 'home.html')  # Загружаем основную страницу (base.html)
+
 def home(request):
     return render(request, 'home.html')
 
@@ -56,7 +63,9 @@ def login_view(request):
 
 class CustomLoginView(LoginView):
     def get_success_url(self):
-        return f'/profile/{self.request.user.username}'
+        #return '/posts/create/'
+        return '/posts/'  # после входа отправлять пользователя на /posts/.
+        # return f'/profile/{self.request.user.username}'
 
 
 def edit_profile(request, username):
@@ -88,11 +97,11 @@ def change_password(request):
     return render(request, 'users/change_password.html', {'form': form})
 
 
-class CustomLoginView(LoginView):
-    template_name = 'users/login.html'  # Твой шаблон входа
+#class CustomLoginView(LoginView):
+    #template_name = 'users/login.html'  # Твой шаблон входа
 
-    def get_success_url(self):
-        return reverse('profile', kwargs={'username': self.request.user.username})
+    #def get_success_url(self):
+        #return reverse('profile', kwargs={'username': self.request.user.username})
 
 
 from django.contrib.auth.views import PasswordResetConfirmView

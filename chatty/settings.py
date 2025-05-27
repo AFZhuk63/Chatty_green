@@ -12,11 +12,14 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
+
+from django.urls import reverse_lazy
 from dotenv import load_dotenv
 
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / '.env')  # Явное указание пути
 
@@ -46,14 +49,21 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'django.contrib.sites',
+
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.github',
+
     # Наши приложения
     'users',
     'posts',
     'subscriptions',
-    'core',
-    'chat',
     'widget_tweaks',
 ]
+
+SITE_ID = 1
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -63,6 +73,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
+
 ]
 
 ROOT_URLCONF = 'chatty.urls'
@@ -92,10 +105,21 @@ WSGI_APPLICATION = 'chatty.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
+"""DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}"""
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('PG_NAME'),
+        'USER': os.getenv('PG_USER'),
+        'PASSWORD': os.getenv('PG_PASSWORD'),
+        'HOST': os.getenv('PG_HOST'),
+        'PORT': os.getenv('PG_PORT'),
     }
 }
 
@@ -167,16 +191,27 @@ if not os.path.exists(MEDIA_ROOT):
     os.makedirs(MEDIA_ROOT)
 
 # URL для входа
-LOGIN_URL = 'login'  # Используем имя нашего URL-пути для входа
-LOGIN_REDIRECT_URL = '/'  # Куда перенаправляет после успешного входа
+#LOGIN_URL = 'home'  # Используем имя нашего URL-пути для входа на домашнюю страницу
+#LOGIN_REDIRECT_URL = '/home/' # Куда перенаправляет после успешного входа
+LOGIN_REDIRECT_URL = '/posts/'  # ✅ Гарантирует, что после входа пользователя отправят на /posts/
+
+LOGOUT_REDIRECT_URL = '/posts/'
+
+
+LOGIN_URL = '/accounts/login/'  # Страница входа
+
+
+
+
+
 
 
 # Проверка загрузки переменных окружения
-print("\n=== Email Configuration ===")
-print(f"EMAIL_HOST: {EMAIL_HOST}")
-print(f"EMAIL_PORT: {EMAIL_PORT}")
-print(f"EMAIL_USE_TLS: {EMAIL_USE_TLS}")
-print(f"EMAIL_HOST_USER: {EMAIL_HOST_USER or 'не установлен'}")
-print(f"EMAIL_HOST_PASSWORD: {'установлен' if EMAIL_HOST_PASSWORD else 'не установлен'}")
-print(f"DEFAULT_FROM_EMAIL: {DEFAULT_FROM_EMAIL}")
-print("=========================\n")
+# print("\n=== Email Configuration ===")
+# print(f"EMAIL_HOST: {EMAIL_HOST}")
+# print(f"EMAIL_PORT: {EMAIL_PORT}")
+# print(f"EMAIL_USE_TLS: {EMAIL_USE_TLS}")
+# print(f"EMAIL_HOST_USER: {EMAIL_HOST_USER or 'не установлен'}")
+# print(f"EMAIL_HOST_PASSWORD: {'установлен' if EMAIL_HOST_PASSWORD else 'не установлен'}")
+# print(f"DEFAULT_FROM_EMAIL: {DEFAULT_FROM_EMAIL}")
+# print("=========================\n")
