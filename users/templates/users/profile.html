@@ -59,6 +59,12 @@
         <strong>Подписок:</strong> {{ profile_user.subscriptions.count|default:"0" }}
       </p>
 
+      <!-- Навигация подписок -->
+      <p class="mt-2">
+        <a href="{% url 'subscriptions:feed' %}">Лента</a> |
+        <a href="{% url 'subscriptions:followers' profile_user.username %}">Подписчики</a> |
+        <a href="{% url 'subscriptions:following' profile_user.username %}">Подписки</a>
+      </p>
     </div>
 
     <!-- Правая колонка: карточки Статей и Видео -->

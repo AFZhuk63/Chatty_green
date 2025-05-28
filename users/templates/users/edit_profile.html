@@ -3,6 +3,7 @@
 {% load static %}
 <link rel="stylesheet" href="{% static 'css/base.css' %}">
 {% block content %}
+
 <div class="container mt-4">
   <h2 class="mb-4">Редактировать профиль {{ user.username|capfirst }}</h2>
   <div class="row">
@@ -19,6 +20,7 @@
             <label for="{{ form.avatar.id_for_label }}" class="btn btn-sm btn-outline-secondary">Изменить фото</label>
           </div>
         </div>
+
       </div>
     </div>
 
