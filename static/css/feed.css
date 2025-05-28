@@ -1,0 +1,169 @@
+/* ======= ОБЩИЕ НАСТРОЙКИ ======= */
+
+/* Устанавливаем базовый шрифт для всего сайта */
+body {
+    font-family: 'Tilda Sans', Tahoma, Geneva, Verdana, sans-serif;  /* Современный читаемый шрифт */
+    font-size: 16px;                        /* Стандартный размер шрифта */
+    color: #333;                            /* Темно-серый цвет текста */
+    background-color: #f8f9fa;              /* Светло-серый фон страницы */
+}
+
+/* Заголовок страницы */
+.page-title {
+    font-size: 22px;                        /* Увеличенный размер шрифта */
+    font-weight: bold;                      /* Жирное начертание */
+    color: #2c3e50;                         /* Темно-синий цвет */
+    margin-bottom: 20px;                    /* Отступ снизу */
+}
+
+
+/* ======= КОНТЕЙНЕРЫ ======= */
+
+/* Общие стили для блоков профиля, карточек постов и пустых состояний */
+.profile-container,
+.post-card,
+.empty-state {
+    background-color: #fff;                 /* Белый фон */
+    border: 1px solid #bca739;                 /* Обводка вокуруг контейнерра */
+    border-radius: 10px;                    /* Скругление углов */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* Легкая тень */
+    padding: 20px;                          /* Внутренний отступ */
+    margin-bottom: 20px;                    /* Отступ снизу */
+}
+
+
+/* ======= КНОПКИ ======= */
+
+/* Базовые стили для всех кнопок */
+.btn {
+    font-size: 12px;                        /* Средний размер текста */
+    padding: 10px 24px;                     /* Увеличенные отступы слева и справа */
+    min-width: 400px;                       /* Минимальная ширина кнопки для длинного текста */
+    border-radius: 6px;                     /* Скругление углов */
+    border: 1px solid transparent;          /* Прозрачная граница по умолчанию */
+    transition: background-color 0.2s ease, color 0.2s ease;
+    text-align: center;                     /* Центрирование текста по горизонтали */
+    white-space: nowrap;                    /* Запрет переноса текста */
+}
+
+/* Стиль кнопки с синей рамкой */
+.btn-outline-primary {
+    color: #007bff;                         /* Синий текст */
+    background-color: transparent;          /* Прозрачный фон */
+    border-color: #007bff;                  /* Синяя граница */
+}
+
+/* При наведении — синий фон и белый текст */
+.btn-outline-primary:hover {
+    background-color: #007bff;
+    color: #fff;
+}
+
+/* Кнопка с серой рамкой */
+.btn-outline-secondary {
+    color: #6c757d;                         /* Серый текст */
+    background-color: transparent;
+    border-color: #6c757d;                  /* Серая граница */
+}
+
+/* При наведении — серый фон и белый текст */
+.btn-outline-secondary:hover {
+    background-color: #6c757d;
+    color: #fff;
+}
+
+/* Кнопки меньшего размера */
+.btn-sm {
+    font-size: 13px;                        /* Уменьшенный размер текста */
+    padding: 6px 12px;                      /* Меньшие отступы */
+}
+
+
+/* ======= АВАТАРЫ ======= */
+
+/* Аватар пользователя — изображение */
+.post-avatar,
+.avatar-placeholder img {
+    width: 48px;                            /* Ширина */
+    height: 48px;                           /* Высота */
+    border-radius: 50%;                     /* Круглая форма */
+    object-fit: cover;                      /* Обрезка изображения без искажения */
+    border: 2px solid #ddd;                 /* Светлая рамка */
+}
+
+/* Заглушка, если нет аватара */
+.avatar-placeholder {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background-color: #eee;                 /* Светло-серый фон */
+    display: flex;                          /* Центрирование текста по оси X и Y */
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;                      /* Жирный текст */
+    color: #555;                            /* Серый цвет текста */
+    border: 2px solid #ccc;                 /* Немного темнее рамка */
+}
+
+
+/* ======= СПИСКИ ПОДПИСЧИКОВ / ПОДПИСОК ======= */
+
+/* Стили для блоков внутри списка */
+.list-group-item {
+    background-color: #fff;                 /* Белый фон */
+    border: 1px solid #eee;                 /* Светлая рамка */
+    border-radius: 6px;                     /* Скругление углов */
+    margin-bottom: 10px;                    /* Отступ между элементами */
+    padding: 12px 16px;                     /* Внутренние отступы */
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04); /* Легкая тень */
+}
+
+/* Отступ для кнопки внутри элемента списка */
+.list-group-item .btn {
+    margin-top: 8px;
+}
+
+
+/* ======= ПАГИНАЦИЯ ======= */
+
+/* Стили для ссылок переключения страниц */
+.pagination .page-link {
+    color: #007bff;                         /* Синий текст */
+    border-radius: 6px;                     /* Скругленные кнопки */
+}
+
+/* При наведении — светлый фон */
+.pagination .page-link:hover {
+    background-color: #e9ecef;
+}
+
+
+/* ======= EMPTY STATE ======= */
+
+/* Центрированный стиль для пустых страниц */
+.empty-state {
+    text-align: center;                     /* Центрирование текста */
+    padding: 40px 20px;                     /* Просторные отступы */
+    border-radius: 10px;                    /* Скругление */
+    border: 1px dashed #bbb;                /* Пунктирная рамка */
+    background-color: #fdfdfd;              /* Почти белый фон */
+}
+
+/* Иконка пустого состояния */
+.empty-state-icon {
+    font-size: 48px;                        /* Крупный размер */
+    color: #aaa;                            /* Светло-серый цвет */
+    margin-bottom: 20px;                    /* Отступ снизу */
+}
+
+/* Заголовок пустого состояния */
+.empty-state-title {
+    font-size: 22px;
+    color: #444;
+}
+
+/* Описание пустого состояния */
+.empty-state-description {
+    font-size: 15px;
+    color: #666;
+}

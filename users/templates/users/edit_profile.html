@@ -42,7 +42,7 @@
 
             <div class="mb-3">
               <label class="form-label">Контакты</label>
-              {{ form.contacts|add_class:"form-control bg-light"|attr:"placeholder:+7 999 123 45 67" }}
+              {{ form.contacts|add_class:"form-control bg-light"|attr:"placeholder:+1 111 111 11 11" }}
             </div>
 
             <div class="mb-3 position-relative">
@@ -70,7 +70,7 @@
         <!-- Кнопки -->
         <div class="d-flex justify-content-between">
           <button type="submit" class="btn btn-primary">Сохранить изменения</button>
-          <a href="{% url 'profile' user.username %}" class="btn btn-outline-secondary">Отмена</a>
+          <a href="{% url 'profile' user.username %}" class="btn btn-primary">Отмена</a>
         </div>
       </form>
     </div>

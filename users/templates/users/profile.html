@@ -6,7 +6,14 @@
 {% block content %}
 
 <div class="container mt-4">
-  <h2>Профиль {{ profile_user.username|capfirst }}</h2>
+  <h2>Профиль {{ profile_user.username|capfirst }}
+  <!-- Навигация подписок -->
+      <p class="mt-2">
+        <a href="{% url 'subscriptions:feed' %}">Лента</a> |
+        <a href="{% url 'subscriptions:followers' profile_user.username %}">Подписчики</a> |
+        <a href="{% url 'subscriptions:following' profile_user.username %}">Подписки</a>
+      </p>
+  </h2>
   <div class="row">
     <!-- Левая колонка: аватар + основная информация + навигация -->
     <div class="col-md-3">
@@ -52,12 +59,6 @@
         <strong>Подписок:</strong> {{ profile_user.subscriptions.count|default:"0" }}
       </p>
 
-      <!-- Навигация подписок -->
-      <p class="mt-2">
-        <a href="{% url 'subscriptions:feed' %}">Лента</a> |
-        <a href="{% url 'subscriptions:followers' profile_user.username %}">Подписчики</a> |
-        <a href="{% url 'subscriptions:following' profile_user.username %}">Подписки</a>
-      </p>
     </div>
 
     <!-- Правая колонка: карточки Статей и Видео -->
