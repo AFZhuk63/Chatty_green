@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
 
-        ('posts', '0009_merge_20250523_1947'),
+        ('posts', '0009_merge_20250522_0025'),]
 
     operations = [
         migrations.AlterField(
