@@ -9,6 +9,8 @@ from posts.views import home  # импортируем наше представ
 from ads.views import home  # отсюда идет функция home()
 from users import views as users_views
 
+app_name = 'users'
+
 
 
 urlpatterns = [
@@ -26,7 +28,7 @@ urlpatterns = [
     path('subscriptions/', include('subscriptions.urls', namespace='subscriptions')),# Маршруты приложения "subscriptions" (подписки пользователей)
     path('search/', search_view, name='search'),  #  Поиск публикаций (функция `search_results`)
     path('social-auth/', include('social_django.urls', namespace='social')),
-
+    path('videopost/', include('videopost.urls')),
 
 
 ]

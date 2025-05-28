@@ -1,4 +1,5 @@
 <!-- templates/include/navbar.html -->
+
 <!-- templates/include/navbar.html -->
 {% load static %}
 <link rel="stylesheet" href="{% static 'css/navbar.css' %}">
@@ -114,14 +115,5 @@ function showSuggestions(query) {
         });
 }
 
-     <script>
-function logoutFunction(e) {
-    e.preventDefault();
-    var logoutForm = document.getElementById("logout-form");
-    if (logoutForm) {
-       logoutForm.submit();
-    } else {
-       console.error("Logout form not found!");
-    }
-}
 </script>
+

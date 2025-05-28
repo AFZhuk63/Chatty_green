@@ -1,3 +1,6 @@
+# -- chatty/settings.py
+
+
 import os
 from pathlib import Path
 from dotenv import load_dotenv
@@ -7,10 +10,12 @@ from django.urls import reverse_lazy
 # Определяем базовую директорию проекта
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+
 # Загружаем переменные окружения из `.env`
 load_dotenv(BASE_DIR / '.env')
 
 # Проверка наличия `.env`
+
 env_path = BASE_DIR / '.env'
 if not env_path.exists():
     print(f"\n⚠️ Внимание: файл .env не найден по пути: {env_path}\n")
@@ -48,13 +53,15 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.github',
     'allauth.socialaccount.providers.google',
 
-
-
     # Твои приложения
     'users',
     'posts',
     'ads',
     'subscriptions',
+
+    'widget_tweaks',
+    'videopost',
+
 ]
 
 # MIDDLEWARE
@@ -96,7 +103,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'chatty.wsgi.application'
 
-# DATABASE
+# Database
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
