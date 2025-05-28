@@ -60,10 +60,12 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
         // Парсим ответ сервера как JSON
+
         const data = await response.json();
 
         // Если сервер вернул успешный ответ
         if (data.success) {
+
           // Обновляем кнопки лайка и дизлайка на странице с учетом данных с сервера
           updateButtons(slug, data.liked, false, data.likes_count, data.dislikes_count);
         } else {
@@ -72,12 +74,14 @@ document.addEventListener("DOMContentLoaded", function () {
         }
       } catch (error) {
         // При ошибке запроса выводим ошибку в консоль
+
         console.error("❌ Ошибка запроса лайка:", error);
       }
     });
   });
 
   // ✅ БЛОК ДИЗЛАЙКОВ
+
   // Аналогично блоку лайков, но для дизлайков
   document.querySelectorAll(".dislike-button").forEach(button => {
     button.style.cursor = "pointer"; // Добавляем курсор для интерактивности
@@ -89,6 +93,7 @@ document.addEventListener("DOMContentLoaded", function () {
       try {
         // Отправляем POST-запрос на дизлайк
         const response = await fetch(`/${type}/${slug}/dislike/`, {
+
           method: "POST",
           headers: {
             "X-CSRFToken": getCSRFToken(),
@@ -99,8 +104,10 @@ document.addEventListener("DOMContentLoaded", function () {
         const data = await response.json();
 
         if (data.success) {
+
           // Обновляем кнопки лайка и дизлайка с учетом ответа сервера
           updateButtons(slug, false, data.disliked, data.likes_count, data.dislikes_count);
+
         } else {
           console.error("❌ Ошибка: сервер не вернул статус success.");
         }
@@ -115,8 +122,10 @@ document.addEventListener("DOMContentLoaded", function () {
   document.querySelectorAll(".comment-button").forEach(button => {
     button.addEventListener("click", function () {
       const slug = this.dataset.slug;
+
       // Переходим по адресу поста с якорем на комментарии
       window.location.href = `/posts/${slug}/#comments`;
+
     });
   });
 
@@ -126,7 +135,9 @@ document.addEventListener("DOMContentLoaded", function () {
     button.addEventListener("click", async function () {
       const postId = this.dataset.id;
 
+
       // Запрашиваем подтверждение действия у пользователя
+
       if (!confirm("Вы уверены, что хотите заархивировать и удалить этот пост?")) return;
 
       try {
@@ -142,7 +153,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (data.success) {
           alert("✅ Пост успешно архивирован и удалён!");
+
           // Удаляем HTML-элемент поста со страницы по id
+
           document.getElementById(`post-${data.post_id}`).remove();
         } else {
           alert("❌ Ошибка при архивировании!");
@@ -155,10 +168,12 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 });
 
+
 /**
  * ФУНКЦИЯ ПОЛУЧЕНИЯ CSRF ТОКЕНА ИЗ COOKIE
  * Возвращает значение токена csrftoken, если он есть в cookie браузера
  */
+
 function getCSRFToken() {
   let cookieValue = null;
 
@@ -168,7 +183,9 @@ function getCSRFToken() {
 
     // Ищем cookie, начинающееся с 'csrftoken='
     if (trimmed.startsWith("csrftoken=")) {
+
       // Извлекаем значение токена из cookie
+
       cookieValue = decodeURIComponent(trimmed.split("=")[1]);
     }
   });

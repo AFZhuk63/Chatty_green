@@ -54,6 +54,7 @@ Chatty_green/
 │   │   ├── 0007_post_is_archived_post_updated_at.py
 │   │   ├── 0008_advertisement_post_advertisement.py
 │   │   ├── 0008_alter_post_slug.py
+│   │   ├── 0009_merge_20250523_1947.py
 │   │   ├── 0009_merge_20250522_0025.py
 │   │   ├── 0010_alter_post_slug.py
 │   │   └── __init__.py
@@ -84,6 +85,7 @@ Chatty_green/
 │   │   ├── home.css
 │   │   ├── interaction-buttons.css
 │   │   ├── navbar.css
+│   │   └── posts.css
 │   │   ├── posts.css
 │   │   └── videopost_detail.css
 │   ├── images/
