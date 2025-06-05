@@ -12,7 +12,7 @@
     <div class="d-flex align-items-center">
       <div class="dropdown">
         <button
-          class="btn btn-dark dropdown-toggle"
+          class="nav-link btn btn-link text-white"
           type="button"
           id="hamburgerDropdown"
           data-bs-toggle="dropdown"
@@ -46,12 +46,11 @@
       </div>
     </div>
 
-
         <!-- 🔍 Поле поиска -->
         <form action="{% url 'search' %}" method="GET" class="search-form">
             <div class="search-input-container">
                 <input type="text" name="q" class="form-control search-input"
-                       placeholder="🔍 Найти пост...">
+                       placeholder="Найти пост...">
             </div>
         </form>
 
@@ -69,7 +68,7 @@
       {% if user.is_authenticated %}
         <li class="nav-item d-flex align-items-center">
           <img src="{% if user.avatar %}{{ user.avatar.url }}{% else %}{{ MEDIA_URL }}avatars/default.png{% endif %}"
-               alt="Аватар" class="rounded-circle" width="30" height="30"
+               alt="Аватар" class="rounded-circle" width="35" height="35"
                style="object-fit: cover; margin-right: 8px;">
           <a class="nav-link" href="{% url 'profile' username=user.username %}">{{ user.username|capfirst }}</a>
         </li>
@@ -84,7 +83,7 @@
           <a class="nav-link" href="{% url 'login' %}">Войти</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link btn btn-primary text-white" href="{% url 'register' %}">Регистрация</a>
+          <a class="nav-link btn btn-link text-white" href="{% url 'register' %}">Регистрация</a>
         </li>
       {% endif %}
     </ul>
@@ -128,9 +127,9 @@
         </ul>
       </div>
     </div>
-
   </div>
 </nav>
+
 
 
 <script>

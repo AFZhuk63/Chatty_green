@@ -1,6 +1,8 @@
+/* static/css/home.css */
 /* === ОСНОВНЫЕ СТИЛИ СТРАНИЦЫ === */
 
 /* Плавное появление страницы */
+@import url('https://fonts.googleapis.com/css2?family=Tilda+Sans:wght@400;600&display=swap');
 body {
   opacity: 0;                     /* Начальная прозрачность (невидимость) */
   transition: opacity 2s ease-in; /* Плавное появление за 2 секунды */
@@ -123,7 +125,7 @@ body.fade-in {
 /* Боковая панель с рекламой */
 .ad-sidebar {
   position: fixed;               /* Фиксированное позиционирование */
-  top: 125px;                    /* Отступ сверху */
+  top: 103px;                    /* Отступ сверху */
   right: calc((67vw - 900px) / 2 + 2mm); /* Вычисляемый отступ справа */
   width: 300px;                  /* Ширина блока */
   max-width: 20vw;               /* Максимальная ширина */
@@ -207,6 +209,7 @@ body.fade-in {
 h1, h2, h3 {
   font-family: "Tilda Sans Bold", sans-serif; /* Жирный шрифт */
   font-size: 14px;                /* Размер текста */
+  color: #1a202c;
 }
 
 /* Основной контейнер контента */
@@ -217,3 +220,4 @@ h1, h2, h3 {
   max-width: 1200px;              /* Максимальная ширина */
   margin: 0 auto;                 /* Центрирование */
 }
+
