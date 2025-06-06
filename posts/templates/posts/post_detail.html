@@ -6,20 +6,67 @@
 {% block content %}
 
   <div class="container mt-4">
-    <h2>{{ post.title|default:"(Без заголовка)" }}</h2>
-    <p>Автор: <a href="{% url 'profile' username=post.author.username %}">{{ post.author.username }}</a></p>
-
-    <p><strong>Дата публикации:</strong> {{ post.publication_date|date:"d M Y H:i" }}</p>
-    <p><strong>Создан:</strong> {{ post.created_at|ru_timesince }}</p>
-
+<h2>{{ post.title|default:"(Без заголовка)" }}</h2>
     <!-- Проверяем, загружено ли изображение -->
     {% if post.image %}
       <img src="{{ post.image.url }}" alt="Изображение поста" class="img-fluid my-3">
     {% endif %}
 
-    <p>{{ post.text }}</p>
+<div class="d-flex justify-content-between align-items-center flex-wrap mb-3">
 
-    <hr>
+  <!-- Автор и подписка -->
+    <div class="d-flex align-items-center gap-2">
+      <p class="author-text mb-0">
+      Автор:
+      <a href="{% url 'profile' username=post.author.username %}" class="text-decoration-none">
+        {{ post.author.username|capfirst }}
+      </a>
+    </p>
+
+       {% if request.user.is_authenticated and request.user.username != post.author.username %}
+        <button
+          type="button"
+          class="btn btn-sm btn-outline-primary subscribe-button d-flex align-items-center"
+          data-username="{{ post.author.username }}"
+        >
+          <i class="fa-solid fa-bell me-1 text-warning"></i>
+          {% if is_subscribed %}
+            Отписаться
+          {% else %}
+            Подписаться
+          {% endif %}
+        </button>
+      {% endif %}
+    </div>
+
+<div style="display: flex; justify-content: center; gap: 3mm;">
+  <button class="btn btn-sm btn-outline-primary like-btn"
+          style="width: 60px; height: 32px !important;"
+          data-slug="{{ post.slug }}"
+          title="Нравится">
+    👍 <span class="like-count">{{ post.likes.count }}</span>
+  </button>
+
+  <button class="btn btn-sm btn-outline-danger dislike-btn"
+          style="width: 60px; height: 32px !important;"
+          data-slug="{{ post.slug }}"
+          title="Не нравится">
+    👎 <span class="dislike-count">{{ post.dislikes.count }}</span>
+  </button>
+</div>
+
+
+    <!-- Дата -->
+    <p class="date-text mb-0 text-muted small ms-2">
+      <strong>Опубликовано:</strong> {{ post.publication_date|date:"d M Y H:i" }}
+    </p>
+  </div>
+
+</div>
+
+<p>{{ post.text|linebreaks }}</p>
+<hr>
+
 
     <!-- Кнопка редактирования (только для автора поста) -->
 
@@ -33,7 +80,7 @@
     <h3>Комментарии</h3>
     <ul>
       {% for comment in post.comments.all %}
-        <li><strong>{{ comment.author.username }}</strong>: {{ comment.text }}</li>
+        <li><strong>{{ comment.author.username|capfirst }}</strong>: {{ comment.text }}</li>
       {% empty %}
         <li>Комментариев пока нет.</li>
       {% endfor %}
@@ -69,6 +116,7 @@
 
 {% block extra_js %}
 <script>
+
   async function confirmDelete(slug) {
     const isConfirmed = confirm("Вы уверены, что хотите удалить этот пост?");
     if (!isConfirmed) return;
@@ -110,6 +158,7 @@
       if (trimmed.startsWith("csrftoken=")) {
         cookieValue = decodeURIComponent(trimmed.split("=")[1]);
       }
+
     });
     return cookieValue;
   }
@@ -120,6 +169,51 @@
       button.addEventListener("click", () => confirmDelete(button.dataset.slug));
     });
   });
+</script>
+<script>
+  document.querySelectorAll('.subscribe-button').forEach(button => {
+    button.addEventListener('click', async () => {
+      const username = button.getAttribute('data-username');
+
+      try {
+        const response = await fetch(`/subscriptions/toggle/${username}/`, {  // Исправленный путь
+          method: 'POST',
+          headers: {
+            'X-CSRFToken': getCSRFToken(),
+            'X-Requested-With': 'XMLHttpRequest',
+          }
+        });
+
+        const data = await response.json();
+        console.log("✅ Ответ сервера:", data);
+
+        if (data.success) {
+          // Меняем текст кнопки
+          button.textContent = data.is_subscribed ? "Отписаться" : "Подписаться";
+
+          // Переключаем стили кнопки
+          button.classList.toggle('btn-primary', !data.is_subscribed);
+          button.classList.toggle('btn-outline-secondary', data.is_subscribed);
+        } else {
+          alert("❌ Ошибка подписки: " + data.message);
+        }
+      } catch (error) {
+        console.error("❌ Ошибка запроса:", error);
+        alert("❌ Ошибка сети.");
+      }
+    });
+  });
+
+  function getCSRFToken() {
+    let cookieValue = null;
+    document.cookie.split(";").forEach(cookie => {
+      const trimmed = cookie.trim();
+      if (trimmed.startsWith("csrftoken=")) {
+        cookieValue = decodeURIComponent(trimmed.split("=")[1]);
+      }
+    });
+    return cookieValue;
+  }
 </script>
 
 

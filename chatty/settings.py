@@ -1,3 +1,4 @@
+# -- chatty/settings.py
 """
 Django settings for chatty project.
 
@@ -13,15 +14,17 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from pathlib import Path
 import os
 
-from django.urls import reverse_lazy
 from dotenv import load_dotenv
+from django.conf.global_settings import AUTHENTICATION_BACKENDS
+from django.urls import reverse_lazy
 
-
-
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-
+# Определяем базовую директорию проекта
 BASE_DIR = Path(__file__).resolve().parent.parent
-load_dotenv(BASE_DIR / '.env')  # Явное указание пути
+
+# Загружаем переменные окружения из `.env`
+load_dotenv(BASE_DIR / '.env')
+
+# Проверка наличия `.env`
 
 env_path = BASE_DIR / '.env'
 if not env_path.exists():
@@ -37,11 +40,17 @@ SECRET_KEY = 'django-insecure-n=s5kr%x^h$7ur^*wwt6skj&pn$wm49##$9a)prz8_nv4nd09t
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'web']  # 'web' - имя сервиса в docker-compose
+INTERNAL_IPS = [ '127.0.0.1', ]
 
-# Application definition
-
+# APPLICATIONS
 INSTALLED_APPS = [
+    # Сторонние пакеты
+    'jazzmin',
+    'django_extensions',
+    'debug_toolbar',
+    'widget_tweaks',
+
+    # Django-приложения
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -49,24 +58,25 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
-
-
+    'social_django',
     'django.contrib.sites',
 
+    # Аутентификация
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.github',
 
-    # Наши приложения
+
+    # Мои приложения
     'users',
     'posts',
+    'ads',
     'subscriptions',
-    'widget_tweaks',
+    'videopost',
 ]
 
-SITE_ID = 1
-
+# MIDDLEWARE
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -77,9 +87,9 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
     'allauth.account.middleware.AccountMiddleware',
-
 ]
 
+# URL & TEMPLATES
 ROOT_URLCONF = 'chatty.urls'
 
 TEMPLATES = [
@@ -95,36 +105,28 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-            ],
-            'libraries': {},
-            'builtins': [],
+                'users.context_processors.socialaccount_providers',
+                # добавляем наш процессор
+                ],
+                'libraries': {},
+                'builtins': [],
+
         },
     },
 ]
 
 WSGI_APPLICATION = 'chatty.wsgi.application'
 
-# Database
-# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-"""
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
-"""
+# DATABASE
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('PG_NAME'),
-        'USER': os.getenv('PG_USER'),
-        'PASSWORD': os.getenv('PG_PASSWORD'),
-        'HOST': os.getenv('PG_HOST'),
-        'PORT': os.getenv('PG_PORT'),
-        'OPTIONS': {
-            'client_encoding': 'UTF8',
-        },
+        'NAME': os.getenv('PG_NAME', ''),
+        'USER': os.getenv('PG_USER', ''),
+        'PASSWORD': os.getenv('PG_PASSWORD', ''),
+        'HOST': os.getenv('PG_HOST', ''),
+        'PORT': os.getenv('PG_PORT', ''),
+        'OPTIONS': {'client_encoding': 'UTF8'},
     }
 }
 
@@ -132,18 +134,10 @@ DATABASES = {
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
 # Authentication
@@ -155,13 +149,16 @@ AUTH_USER_MODEL = 'users.CustomUser'
 LANGUAGE_CODE = 'ru-ru'
 TIME_ZONE = 'UTC'
 USE_I18N = True
+
 USE_L10N = True  # включить локализацию чисел и дат
+
 USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+# STATIC_URL = 'static/' локальная версия
+STATIC_URL = 'https://chatty-green.s3.amazonaws.com/static/'# серверная версия URL
 STATIC_ROOT = BASE_DIR / 'staticfiles'  # для collectstatic
 STATICFILES_DIRS = [BASE_DIR / 'static']  # дополнительные папки со статикой
 
@@ -189,6 +186,67 @@ if not os.getenv('EMAIL_HOST_USER') or not os.getenv('EMAIL_HOST_PASSWORD'):
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+JAZZMIN_SETTINGS = {
+    "site_title": "Info to Chatty_green Admin",  # Заголовок административной панели
+    "site_header": "CHATTY: Admin",  # Заголовок окна браузера
+    "site_brand": "Info to Chatty",  # Бренд сайта
+    "welcome_sign": "Welcome to CHATTY: Admin",  # Приветственное сообщение
+    "copyright": "CHATTY GmbH",  # Информация о копирайте
+    "topmenu_links": [
+        {"name": "Home", "url": "admin:index", "permissions": ["auth.view_user"]},
+        {"name": "Support", "url": "https://google.com", "new_window": True},
+    ],
+    "usermenu_links": [
+        {"name": "Support", "url": "https://github.com/farridav/django-jazzmin/issues", "new_window": True},
+        {"model": "auth.user"}
+    ],
+    "show_sidebar": True,  # Показать боковую панель
+    "navigation_expanded": True,  # Развернуть навигацию
+    "hide_apps": [],  # Скрыть приложения
+    "hide_models": [],  # Скрыть модели
+    "default_icon_parents": "fas fa-chevron-circle-right",  # Иконка для родительских элементов
+    "default_icon_children": "fas fa-circle",  # Иконка для дочерних элементов
+    "related_modal_active": False,  # Включить модальные окна для связанных объектов
+    "custom_css": None,  # Пользовательский CSS
+    "custom_js": None,  # Пользовательский JS
+    "use_google_fonts_cdn": True,  # Использовать Google Fonts CDN
+    "show_ui_builder": False,  # Показать конструктор интерфейса
+}
+
+
+JAZZMIN_UI_TWEAKS = {
+    "navbar_small_text": False,
+    "footer_small_text": False,
+    "body_small_text": True,
+    "brand_small_text": False,
+    "brand_colour": "navbar-warning",
+    "accent": "accent-lime",
+    "navbar": "navbar-info navbar-dark",
+    "no_navbar_border": True,
+    "navbar_fixed": True,
+    "layout_boxed": False,
+    "footer_fixed": False,
+    "sidebar_fixed": True,
+    "sidebar": "sidebar-dark-pink",
+    "sidebar_nav_small_text": False,
+    "sidebar_disable_expand": False,
+    "sidebar_nav_child_indent": False,
+    "sidebar_nav_compact_style": True,
+    "sidebar_nav_legacy_style": False,
+    "sidebar_nav_flat_style": True,
+    "theme": "cyborg",
+    "dark_mode_theme": None,
+    "button_classes": {
+        "primary": "btn-primary",
+        "secondary": "btn-secondary",
+        "info": "btn-info",
+        "warning": "btn-warning",
+        "danger": "btn-danger",
+        "success": "btn-success"
+    },
+    "actions_sticky_top": False
+}
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
@@ -196,28 +254,98 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 if not os.path.exists(MEDIA_ROOT):
     os.makedirs(MEDIA_ROOT)
 
-# URL для входа
-#LOGIN_URL = 'home'  # Используем имя нашего URL-пути для входа на домашнюю страницу
-#LOGIN_REDIRECT_URL = '/home/' # Куда перенаправляет после успешного входа
-LOGIN_REDIRECT_URL = '/posts/'  # ✅ Гарантирует, что после входа пользователя отправят на /posts/
+# AUTHENTICATION
+AUTH_USER_MODEL = 'users.CustomUser'
+
+AUTHENTICATION_BACKENDS = (
+    'social_core.backends.google.GoogleOAuth2',
+    #'social_core.backends.telegram.TelegramOAuth2',
+    'django.contrib.auth.backends.ModelBackend',
+)
+
+# Настройки для Google
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.getenv('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY')
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.getenv('SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET')
+
+# Настройки для Telegram
+#SOCIAL_AUTH_TELEGRAM_BOT_TOKEN = 'ВАШ_TELEGRAM_BOT_TOKEN'
+
+LOGIN_URL = 'login'
+LOGOUT_URL = 'logout'
+LOGIN_REDIRECT_URL = '/'  # Страница после входа
+LOGOUT_REDIRECT_URL = '/'  # Страница после выхода
+
+
 
 LOGOUT_REDIRECT_URL = '/posts/'
 
+SITE_ID = 1
 
-LOGIN_URL = '/accounts/login/'  # Страница входа
+ACCOUNT_LOGIN_METHODS = ['username']
+ACCOUNT_SIGNUP_FIELDS = ['username*', 'email*', 'password1*', 'password2*']
+
+ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+
+ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 3
+ACCOUNT_EMAIL_CONFIRMATION_HMAC = True
+ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = "/"
+ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
+ACCOUNT_FORMS = {'signup': 'users.forms.CustomSignupForm'}
 
 
+# SOCIAL ACCOUNT Вариант от Оли
+# SOCIALACCOUNT_PROVIDERS = {
+#     'google': {
+#          'APP': {  # Удалите или закомментируйте этот блок!
+#              'client_id': os.getenv('GOOGLE_CLIENT_ID', ""),
+#              'secret': os.getenv('GOOGLE_CLIENT_SECRET', ""),
+#              'key': '',
+#          },
+#         'SCOPE': ['email', 'profile'],
+#         'AUTH_PARAMS': {'access_type': 'online'},
+#     },
+#     'github': {
+#         'SCOPE': ['user:email'],
+#         'AUTH_PARAMS': {'access_type': 'online'},
+#     },
+# }
+
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': ['email', 'profile'],
+        'AUTH_PARAMS': {'access_type': 'online'},
+    },
+    'github': {
+        'SCOPE': ['user:email'],
+        'AUTH_PARAMS': {'access_type': 'online'},
+    },
+}
 
 
+#SOCIALACCOUNT_LOGIN_ON_GET = True
+
+
+# SESSION CONFIGURATION
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+SESSION_COOKIE_AGE = 1209600
+SESSION_SAVE_EVERY_REQUEST = True
+
+# ENVIRONMENT VALIDATION
+if not os.getenv('EMAIL_HOST_USER') or not os.getenv('EMAIL_HOST_PASSWORD'):
+    raise ValueError("⚠️ Внимание: EMAIL_HOST_USER или EMAIL_HOST_PASSWORD не установлены! Проверьте файл .env.")
 
 
 
 # Проверка загрузки переменных окружения
-# print("\n=== Email Configuration ===")
-# print(f"EMAIL_HOST: {EMAIL_HOST}")
-# print(f"EMAIL_PORT: {EMAIL_PORT}")
-# print(f"EMAIL_USE_TLS: {EMAIL_USE_TLS}")
-# print(f"EMAIL_HOST_USER: {EMAIL_HOST_USER or 'не установлен'}")
-# print(f"EMAIL_HOST_PASSWORD: {'установлен' if EMAIL_HOST_PASSWORD else 'не установлен'}")
-# print(f"DEFAULT_FROM_EMAIL: {DEFAULT_FROM_EMAIL}")
-# print("=========================\n")
+print("\n=== Email Configuration ===")
+print(f"EMAIL_HOST: {EMAIL_HOST}")
+print(f"EMAIL_PORT: {EMAIL_PORT}")
+print(f"EMAIL_USE_TLS: {EMAIL_USE_TLS}")
+print(f"EMAIL_HOST_USER: {EMAIL_HOST_USER or 'не установлен'}")
+print(f"EMAIL_HOST_PASSWORD: {'установлен' if EMAIL_HOST_PASSWORD else 'не установлен'}")
+print(f"DEFAULT_FROM_EMAIL: {DEFAULT_FROM_EMAIL}")
+print("=========================\n")
+
+print(repr(os.getenv("PG_NAME")))
+print(repr(os.getenv("PG_PASSWORD")))
+
