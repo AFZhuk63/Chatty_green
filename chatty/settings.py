@@ -330,7 +330,7 @@ ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = "/"
 ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 ACCOUNT_FORMS = {'signup': 'users.forms.CustomSignupForm'}
 
-# LOGIN_URL = '/accounts/login/'  # Страница входа
+LOGIN_URL = '/accounts/login/'  # Страница входа
 
 # SOCIAL ACCOUNT Вариант от Оли
 # SOCIALACCOUNT_PROVIDERS = {
