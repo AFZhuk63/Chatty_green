@@ -34,11 +34,30 @@ if not env_path.exists():
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-n=s5kr%x^h$7ur^*wwt6skj&pn$wm49##$9a)prz8_nv4nd09t'
 
+SECRET_KEY = os.getenv('SECRET_KEY', '')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+
+ALLOWED_HOSTS = [
+    '127.0.0.1',
+    'localhost',
+    'chatty-green.onrender.com',
+]
+
+# Чтобы Django принимал AJAX-запросы (например, от фронтенда Vue/React)
+CSRF_TRUSTED_ORIGINS = [
+    'http://127.0.0.1:8000',
+    'http://localhost:8000',
+    'https://chatty-green.onrender.com',
+]
+
+CORS_ALLOWED_ORIGINS = [
+    "http://127.0.0.1:8000",
+    "http://localhost:8000",
+    "https://chatty-green.onrender.com",
+]
 
 INTERNAL_IPS = [ '127.0.0.1', ]
 
@@ -49,6 +68,8 @@ INSTALLED_APPS = [
     'django_extensions',
     'debug_toolbar',
     'widget_tweaks',
+    'corsheaders',
+
 
     # Django-приложения
     'django.contrib.admin',
@@ -65,6 +86,7 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
     'allauth.socialaccount.providers.github',
 
 
@@ -78,6 +100,7 @@ INSTALLED_APPS = [
 
 # MIDDLEWARE
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -87,6 +110,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
     'allauth.account.middleware.AccountMiddleware',
+    'social_django.middleware.SocialAuthExceptionMiddleware',
 ]
 
 # URL & TEMPLATES
@@ -141,7 +165,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 # Authentication
-AUTH_USER_MODEL = 'users.CustomUser'
+# AUTH_USER_MODEL = 'users.CustomUser'
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
@@ -158,7 +182,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 # STATIC_URL = 'static/' локальная версия
-STATIC_URL = 'https://chatty-green.s3.amazonaws.com/static/'# серверная версия URL
+# STATIC_URL = 'https://chatty-green.s3.amazonaws.com/static/'# серверная версия URL
 STATIC_ROOT = BASE_DIR / 'staticfiles'  # для collectstatic
 STATICFILES_DIRS = [BASE_DIR / 'static']  # дополнительные папки со статикой
 
@@ -250,22 +274,38 @@ JAZZMIN_UI_TWEAKS = {
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+STATIC_URL= f'https://chatty-green.s3.amazonaws.com/static/'
+
+# Кастомное хранилище для медиа
+from storages.backends.s3boto3 import S3Boto3Storage
+
+class MediaStorage(S3Boto3Storage):
+    location = 'media'
+    file_overwrite = False
+
+# DEFAULT_FILE_STORAGE = 'chatty-green.storage_backends.MediaStorage'
+
 # Создаем папку media если не существует
 if not os.path.exists(MEDIA_ROOT):
     os.makedirs(MEDIA_ROOT)
+
 
 # AUTHENTICATION
 AUTH_USER_MODEL = 'users.CustomUser'
 
 AUTHENTICATION_BACKENDS = (
-    'social_core.backends.google.GoogleOAuth2',
+    'social_core.backends.google.GoogleOAuth2', # для python-social-auth
+    'allauth.account.auth_backends.AuthenticationBackend',  # для allauth
     #'social_core.backends.telegram.TelegramOAuth2',
-    'django.contrib.auth.backends.ModelBackend',
+    'django.contrib.auth.backends.ModelBackend',    # стандартный бэкенд
 )
 
 # Настройки для Google
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.getenv('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY')
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.getenv('SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET')
+SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = ['email', 'profile']
+SOCIAL_AUTH_GOOGLE_OAUTH2_AUTH_EXTRA_ARGUMENTS = {'access_type': 'online'}
 
 # Настройки для Telegram
 #SOCIAL_AUTH_TELEGRAM_BOT_TOKEN = 'ВАШ_TELEGRAM_BOT_TOKEN'
@@ -274,8 +314,6 @@ LOGIN_URL = 'login'
 LOGOUT_URL = 'logout'
 LOGIN_REDIRECT_URL = '/'  # Страница после входа
 LOGOUT_REDIRECT_URL = '/'  # Страница после выхода
-
-
 
 LOGOUT_REDIRECT_URL = '/posts/'
 
@@ -292,6 +330,7 @@ ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = "/"
 ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 ACCOUNT_FORMS = {'signup': 'users.forms.CustomSignupForm'}
 
+LOGIN_URL = '/accounts/login/'  # Страница входа
 
 # SOCIAL ACCOUNT Вариант от Оли
 # SOCIALACCOUNT_PROVIDERS = {
@@ -310,20 +349,20 @@ ACCOUNT_FORMS = {'signup': 'users.forms.CustomSignupForm'}
 #     },
 # }
 
+# Настройки для allauth (альтернативный вариант):
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
-        'SCOPE': ['email', 'profile'],
+        'SCOPE': ['profile', 'email'],
         'AUTH_PARAMS': {'access_type': 'online'},
-    },
-    'github': {
-        'SCOPE': ['user:email'],
-        'AUTH_PARAMS': {'access_type': 'online'},
-    },
+        'APP': {
+            'client_id': os.getenv('GOOGLE_OAUTH_CLIENT_ID'),
+            'secret': os.getenv('GOOGLE_OAUTH_CLIENT_SECRET'),
+            'key': ''
+        }
+    }
 }
 
-
 #SOCIALACCOUNT_LOGIN_ON_GET = True
-
 
 # SESSION CONFIGURATION
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
@@ -334,18 +373,54 @@ SESSION_SAVE_EVERY_REQUEST = True
 if not os.getenv('EMAIL_HOST_USER') or not os.getenv('EMAIL_HOST_PASSWORD'):
     raise ValueError("⚠️ Внимание: EMAIL_HOST_USER или EMAIL_HOST_PASSWORD не установлены! Проверьте файл .env.")
 
+BASE_DIR = Path(__file__).resolve().parent.parent
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
+# INSTALLED_APPS += ['storages'] переменная уже объявлена в основном INSTALLED_APPS
 
-# Проверка загрузки переменных окружения
-print("\n=== Email Configuration ===")
-print(f"EMAIL_HOST: {EMAIL_HOST}")
-print(f"EMAIL_PORT: {EMAIL_PORT}")
-print(f"EMAIL_USE_TLS: {EMAIL_USE_TLS}")
-print(f"EMAIL_HOST_USER: {EMAIL_HOST_USER or 'не установлен'}")
-print(f"EMAIL_HOST_PASSWORD: {'установлен' if EMAIL_HOST_PASSWORD else 'не установлен'}")
-print(f"DEFAULT_FROM_EMAIL: {DEFAULT_FROM_EMAIL}")
-print("=========================\n")
+if DEBUG:
+    # Локальное хранилище медиафайлов
+    MEDIA_URL = '/media/'
+    MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-print(repr(os.getenv("PG_NAME")))
-print(repr(os.getenv("PG_PASSWORD")))
+    STATIC_URL = '/static/'
+    STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+
+    DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+
+else:
+    # AWS S3 хранилище
+    AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
+    AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
+    AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME')
+    AWS_S3_REGION_NAME = os.getenv('AWS_S3_REGION_NAME', 'us-east-1')
+    AWS_S3_ENDPOINT_URL = os.getenv('AWS_S3_ENDPOINT_URL', 'https://s3.amazonaws.com')
+
+    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+    MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/media/'
+
+    AWS_QUERYSTRING_AUTH = False
+    AWS_S3_FILE_OVERWRITE = False
+    AWS_DEFAULT_ACL = 'public-read'
+
+    # Логируем предупреждение, если переменные AWS отсутствуют
+    required_aws_vars = ['AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY', 'AWS_STORAGE_BUCKET_NAME']
+    missing_aws_vars = [var for var in required_aws_vars if not os.getenv(var)]
+    if missing_aws_vars:
+        print(f"\n⚠️ Внимание: не установлены переменные AWS: {', '.join(missing_aws_vars)}\n"
+              "Проверьте файл .env и добавьте недостающие значения.\n")
+
+# # Проверка загрузки переменных окружения
+# print("\n=== Email Configuration ===")
+# print(f"EMAIL_HOST: {EMAIL_HOST}")
+# print(f"EMAIL_PORT: {EMAIL_PORT}")
+# print(f"EMAIL_USE_TLS: {EMAIL_USE_TLS}")
+# print(f"EMAIL_HOST_USER: {EMAIL_HOST_USER or 'не установлен'}")
+# print(f"EMAIL_HOST_PASSWORD: {'установлен' if EMAIL_HOST_PASSWORD else 'не установлен'}")
+# print(f"DEFAULT_FROM_EMAIL: {DEFAULT_FROM_EMAIL}")
+# print("=========================\n")
+
+# print(repr(os.getenv("PG_NAME")))
+# print(repr(os.getenv("PG_PASSWORD")))
 
