@@ -182,7 +182,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 # STATIC_URL = 'static/' локальная версия
-STATIC_URL = 'https://chatty-green.s3.amazonaws.com/static/'# серверная версия URL
+# STATIC_URL = 'https://chatty-green.s3.amazonaws.com/static/'# серверная версия URL
 STATIC_ROOT = BASE_DIR / 'staticfiles'  # для collectstatic
 STATICFILES_DIRS = [BASE_DIR / 'static']  # дополнительные папки со статикой
 
@@ -376,7 +376,7 @@ if not os.getenv('EMAIL_HOST_USER') or not os.getenv('EMAIL_HOST_PASSWORD'):
 BASE_DIR = Path(__file__).resolve().parent.parent
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
-INSTALLED_APPS += ['storages']
+# INSTALLED_APPS += ['storages'] переменная уже объявлена в основном INSTALLED_APPS
 
 if DEBUG:
     # Локальное хранилище медиафайлов
