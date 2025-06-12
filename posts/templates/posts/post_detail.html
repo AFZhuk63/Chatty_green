@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <! --posts/templates/posts/post_detail.html -->
 
 {% extends 'base.html' %}
@@ -7,7 +8,7 @@
 {% block content %}
 
 {% block scripts %}
-  <script src="{% static 'subscriptions/js/subscriptions.js' %}"></script>
+  <script src="{% static 'js/subscriptions.js' %}"></script>
 {% endblock %}
 
   <div class="container mt-4">
@@ -43,22 +44,22 @@
         </button>
       {% endif %}
     </div>
+        <!-- Лайки и дизлайки -->
+        <div style="display: flex; justify-content: center; gap: 3mm;">
+          <button class="btn btn-sm btn-outline-primary like-btn"
+                  style="width: 60px; height: 32px !important;"
+                  data-slug="{{ post.slug }}"
+                  title="Нравится">
+            👍 <span class="like-count">{{ post.likes.count }}</span>
+          </button>
 
-<div style="display: flex; justify-content: center; gap: 3mm;">
-  <button class="btn btn-sm btn-outline-primary like-btn"
-          style="width: 60px; height: 32px !important;"
-          data-slug="{{ post.slug }}"
-          title="Нравится">
-    👍 <span class="like-count">{{ post.likes.count }}</span>
-  </button>
-
-  <button class="btn btn-sm btn-outline-danger dislike-btn"
-          style="width: 60px; height: 32px !important;"
-          data-slug="{{ post.slug }}"
-          title="Не нравится">
-    👎 <span class="dislike-count">{{ post.dislikes.count }}</span>
-  </button>
-</div>
+          <button class="btn btn-sm btn-outline-danger dislike-btn"
+                  style="width: 60px; height: 32px !important;"
+                  data-slug="{{ post.slug }}"
+                  title="Не нравится">
+            👎 <span class="dislike-count">{{ post.dislikes.count }}</span>
+          </button>
+        </div>
 
 
     <!-- Дата -->

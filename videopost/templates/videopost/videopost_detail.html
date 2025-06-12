@@ -101,10 +101,16 @@
 
     <!-- Лайки и дизлайки -->
     <div class="d-flex align-items-center gap-2">
-      <button class="btn btn-sm btn-outline-primary like-btn" style="width: 60px; height: 32px !important;" data-slug="{{ videopost.slug }}">
+      <button class="btn btn-sm btn-outline-primary like-btn"
+              style="width: 60px; height: 32px !important;"
+              data-slug="{{ videopost.slug }}"
+              title="Нравится">
         👍 <span class="like-count">{{ videopost.likes.count }}</span>
       </button>
-      <button class="btn btn-sm btn-outline-danger dislike-btn" style="width: 60px; height: 32px !important;" data-slug="{{ videopost.slug }}">
+      <button class="btn btn-sm btn-outline-danger dislike-btn"
+              style="width: 60px; height: 32px !important;"
+              data-slug="{{ videopost.slug }}">
+              title="Не нравится">
         👎 <span class="dislike-count">{{ videopost.dislikes.count }}</span>
       </button>
     </div>
@@ -187,29 +193,34 @@
 
 {% block extra_js %}
 <script>
+  // Функция подтверждения и выполнения удаления видеопоста
   async function confirmDelete(slug) {
+    // Показываем диалоговое окно подтверждения
     const isConfirmed = confirm("Вы уверены, что хотите удалить этот видеопост?");
     if (!isConfirmed) return;
 
     try {
+      // Отправляем POST-запрос на сервер для архивации видеопоста
       const response = await fetch(`/videopost/${slug}/archive/`, {
-        method: "POST",
+        method: "POST", // Используем POST-метод
         headers: {
-          "X-CSRFToken": getCSRFToken(),
-          "X-Requested-With": "XMLHttpRequest",
+          "X-CSRFToken": getCSRFToken(), // Добавляем CSRF-токен для защиты от подделки запросов
+          "X-Requested-With": "XMLHttpRequest", // Пометка AJAX-запроса
         },
       });
-
+      // Парсим JSON-ответ от сервера
       const data = await response.json();
-      console.log("✅ Ответ сервера:", data);
+      console.log("✅ Ответ сервера:", data); // Логируем ответ для отладки
 
       if (data.success) {
+        // При успешном удалении показываем уведомление и перенаправляем
         alert("✅ Видеопост успешно удалён!");
-        window.location.href = "/videopost/";
+        window.location.href = "/videopost/"; // Редирект на список видеопостов
       } else {
-        alert("❌ Ошибка удаления видеопоста.");
+        alert("❌ Ошибка удаления видеопоста."); // Сервер вернул ошибку
       }
     } catch (error) {
+      // Обработка ошибок сети или парсинга
       console.error("❌ Ошибка при удалении:", error);
       alert("❌ Ошибка при удалении видеопоста.");
     }
@@ -217,21 +228,28 @@
 
   function getCSRFToken() {
     let cookieValue = null;
+    // Разбиваем строку cookie на отдельные части
     document.cookie.split(";").forEach(cookie => {
-      const trimmed = cookie.trim();
+      const trimmed = cookie.trim();   // Удаляем лишние пробелы
       if (trimmed.startsWith("csrftoken=")) {
+        // Декодируем значение токена
         cookieValue = decodeURIComponent(trimmed.split("=")[1]);
       }
     });
-    return cookieValue;
+    return cookieValue;   // Возвращаем найденный токен или null
   }
 
+  // Находим все кнопки лайков/дизлайков на странице
   document.querySelectorAll('.like-btn, .dislike-btn').forEach(button => {
+    // Добавляем обработчик клика для каждой кнопки
     button.addEventListener('click', async () => {
+      // Получаем уникальный идентификатор поста из data-атрибута
       const slug = button.getAttribute('data-slug');
+      // Определяем действие (like/dislike) по классу кнопки
       const action = button.classList.contains('like-btn') ? 'like' : 'dislike';
 
       try {
+        // Отправляем запрос на сервер
         const response = await fetch(`/videopost/${slug}/${action}/`, {
           method: 'POST',
           headers: {
@@ -239,17 +257,20 @@
             'X-Requested-With': 'XMLHttpRequest',
           },
         });
+        // Получаем и парсим ответ сервера
         const data = await response.json();
 
         if (data.success) {
+          // Находим родительский контейнер кнопки
           const container = button.parentElement;
+          // Обновляем счетчики на странице
           container.querySelector('.like-count').textContent = data.likes_count;
           container.querySelector('.dislike-count').textContent = data.dislikes_count;
         } else {
           alert('Ошибка при отправке лайка/дизлайка');
         }
       } catch (error) {
-        alert('Ошибка сети');
+        alert('Ошибка сети'); // Ошибка при выполнении fetch-запроса
       }
     });
   });
