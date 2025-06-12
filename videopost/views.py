@@ -193,7 +193,9 @@ class VideoFeedView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         subscribed_authors = Subscription.objects.filter(subscriber=self.request.user).values_list('author', flat=True)
-        return VideoPost.objects.filter(author__in=subscribed_authors).order_by('-publication_date')
+        # return VideoPost.objects.filter(author__in=subscribed_authors).order_by('-publication_date') # ленивая загрузка
+        # return VideoPost.objects.filter(author__in=subscribed_authors).select_related("author").order_by('-publication_date')
+        return VideoPost.objects.filter(author__in=subscribed_authors).select_related("author").prefetch_related("tags").order_by('-publication_date')  # Если у постов есть ManyToMany или обратные связи (например, comments) используем ускоренную загрузку,
 
 
 def archive_videopost(request, slug):

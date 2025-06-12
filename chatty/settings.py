@@ -71,6 +71,7 @@ INSTALLED_APPS = [
     'corsheaders',
 
 
+
     # Django-приложения
     'django.contrib.admin',
     'django.contrib.auth',
@@ -376,7 +377,7 @@ if not os.getenv('EMAIL_HOST_USER') or not os.getenv('EMAIL_HOST_PASSWORD'):
 BASE_DIR = Path(__file__).resolve().parent.parent
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
-# INSTALLED_APPS += ['storages'] переменная уже объявлена в основном INSTALLED_APPS
+INSTALLED_APPS += ['storages'] # переменная уже объявлена в основном INSTALLED_APPS
 
 if DEBUG:
     # Локальное хранилище медиафайлов

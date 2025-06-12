@@ -124,8 +124,10 @@ def toggle_like(request, slug):
         'success': True,
         'liked': liked,
         'likes_count': post.likes.count(),
+        'dislikes_count': post.dislikes.count(),
     })
 
+@login_required
 @require_POST
 def dislike_post(request, slug):
     post = get_object_or_404(Post, slug=slug)
@@ -172,7 +174,9 @@ class FeedView(LoginRequiredMixin, ListView):
         # Получаем список авторов, на которых подписан текущий пользователь
         subscribed_authors = Subscription.objects.filter(subscriber=self.request.user).values_list('author', flat=True)
         # Фильтруем посты только от этих авторов
-        return Post.objects.filter(author__in=subscribed_authors).order_by('-publication_date')
+        # return Post.objects.filter(author__in=subscribed_authors).order_by('-publication_date') # ленивая загрузка
+        # return Post.objects.filter(author__in=subscribed_authors).select_related("author").order_by('-publication_date') # ленивая загрузка
+        return Post.objects.filter(author__in=subscribed_authors).select_related("author").prefetch_related("tags").order_by('-publication_date') # Если у постов есть ManyToMany или обратные связи (например, comments) используем ускоренную загрузку,
 
 
 def archive_post(request, slug):
