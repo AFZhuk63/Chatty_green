@@ -101,18 +101,18 @@
 
     <!-- Лайки и дизлайки -->
     <div class="d-flex align-items-center gap-2">
-      <button class="btn btn-sm btn-outline-primary like-btn"
-              style="width: 60px; height: 32px !important;"
-              data-slug="{{ videopost.slug }}"
-              title="Нравится">
-        👍 <span class="like-count">{{ videopost.likes.count }}</span>
-      </button>
-      <button class="btn btn-sm btn-outline-danger dislike-btn"
-              style="width: 60px; height: 32px !important;"
-              data-slug="{{ videopost.slug }}">
-              title="Не нравится">
-        👎 <span class="dislike-count">{{ videopost.dislikes.count }}</span>
-      </button>
+        <button class="btn btn-sm btn-outline-primary like-btn"
+                style="width: 60px; height: 32px !important;"
+                data-slug="{{ videopost.slug }}"
+                title="Нравится">
+          👍 <span class="like-count">{{ videopost.likes.count }}</span>
+        </button>
+        <button class="btn btn-sm btn-outline-danger dislike-btn"
+                style="width: 60px; height: 32px !important;"
+                data-slug="{{ videopost.slug }}"
+                title="Не нравится">
+          👎 <span class="dislike-count">{{ videopost.dislikes.count }}</span>
+        </button>
     </div>
 
     <!-- Дата -->
@@ -215,6 +215,11 @@
       if (data.success) {
         // При успешном удалении показываем уведомление и перенаправляем
         alert("✅ Видеопост успешно удалён!");
+
+         // Удаляем пост из DOM
+        const postElement = document.getElementById(`videopost-${slug}`);
+        if (postElement) postElement.remove();
+
         window.location.href = "/videopost/"; // Редирект на список видеопостов
       } else {
         alert("❌ Ошибка удаления видеопоста."); // Сервер вернул ошибку

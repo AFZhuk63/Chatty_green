@@ -108,23 +108,23 @@ class PostDetailView(DetailView):
 @login_required
 @require_POST
 def toggle_like(request, slug):
-    try:
-        post = get_object_or_404(Post, slug=slug)
-    except Post.DoesNotExist:
-        return JsonResponse({'error': 'Пост не найден'}, status=404)
+    post = get_object_or_404(Post, slug=slug)
+    user = request.user
 
-    if request.user in post.likes.all():
-        post.likes.remove(request.user)
+    if post.likes.filter(id=user.id).exists():
+        post.likes.remove(user)
         liked = False
     else:
-        post.likes.add(request.user)
+        if post.dislikes.filter(id=user.id).exists():
+            post.dislikes.remove(user)
+        post.likes.add(user)
         liked = True
 
     return JsonResponse({
         'success': True,
         'liked': liked,
         'likes_count': post.likes.count(),
-        'dislikes_count': post.dislikes.count(),
+        'dislikes_count': post.dislikes.count(),  # Добавлено для синхронизации
     })
 
 @login_required
@@ -133,19 +133,21 @@ def dislike_post(request, slug):
     post = get_object_or_404(Post, slug=slug)
     user = request.user
 
-    if user in post.dislikes.all():
+    if post.dislikes.filter(id=user.id).exists():
         post.dislikes.remove(user)
         disliked = False
     else:
+        if post.likes.filter(id=user.id).exists():
+            post.likes.remove(user)
         post.dislikes.add(user)
         disliked = True
 
     return JsonResponse({
-        'success': True,  # ✅ Добавляем статус success
+        'success': True,
         'disliked': disliked,
+        'likes_count': post.likes.count(),  # Добавлено для синхронизации
         'dislikes_count': post.dislikes.count(),
     })
-
 
 class PostDetailViewSlug(DetailView):
     model = Post

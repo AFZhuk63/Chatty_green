@@ -124,22 +124,25 @@
 <script>
 
   async function confirmDelete(slug) {
-    const isConfirmed = confirm("Вы уверены, что хотите удалить этот пост?");
+        // Показываем диалоговое окно подтверждения
+      const isConfirmed = confirm("Вы уверены, что хотите удалить этот пост?");
     if (!isConfirmed) return;
 
     try {
+        // Отправляем POST-запрос на сервер для архивации видеопоста
       const response = await fetch(`/posts/${slug}/archive/`, {
-        method: "POST",
+        method: "POST",   // Используем POST-метод
         headers: {
-          "X-CSRFToken": getCSRFToken(),
-          "X-Requested-With": "XMLHttpRequest",
+          "X-CSRFToken": getCSRFToken(),            // Добавляем CSRF-токен для защиты от подделки запросов
+          "X-Requested-With": "XMLHttpRequest",     // Пометка AJAX-запроса
         },
       });
-
+       // Парсим JSON-ответ от сервера
       const data = await response.json();
-      console.log("✅ Ответ сервера:", data);
+          console.log("✅ Ответ сервера:", data);  // Логируем ответ для отладки
 
       if (data.success) {
+          // При успешном удалении показываем уведомление и перенаправляем
         alert("✅ Ваш пост успешно удалён!");
 
         // Удаляем пост из DOM
@@ -147,11 +150,12 @@
         if (postElement) postElement.remove();
 
         // Перенаправляем на список постов
-        window.location.href = "/posts/";
+        window.location.href = "/posts/";       // Редирект на список видеопостов
       } else {
-        alert("❌ Ошибка удаления поста.");
+        alert("❌ Ошибка удаления поста.");     // Сервер вернул ошибку
       }
     } catch (error) {
+        // Обработка ошибок сети или парсинга
       console.error("❌ Ошибка при удалении:", error);
       alert("❌ Ошибка при удалении поста.");
     }
