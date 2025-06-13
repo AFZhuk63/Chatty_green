@@ -1,5 +1,21 @@
 //* static/js/subscriptions.js *//
 
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.startsWith(name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Subscription script loaded!');
 
@@ -59,9 +75,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 button.disabled = originalDisabled;
             }, 5000); // Таймаут запроса 5 секунд
 
-            //* fetch('http://host.docker.internal:8000/subscriptions/toggle/' + username, { *//
             fetch(`/subscriptions/toggle/${username}/`, {
-
                 method: 'POST',
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
@@ -82,22 +96,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.log('Server response:', data);
 
                 const subscribersCountElem = document.getElementById('subscribers-count');
-                if (subscribersCountElem) {
+                if (subscribersCountElem && typeof data.subscribers_count !== 'undefined') {
                     subscribersCountElem.textContent = data.subscribers_count;
                 }
 
-                if (data.is_subscribed) {
+                // Обновляем содержимое кнопки
+                if (data.subscribed) {
                     button.innerHTML = '<i class="fa-solid fa-user-minus me-1 text-warning"></i> Отписаться';
                 } else {
                     button.innerHTML = '<i class="fa-solid fa-user-plus me-1 text-warning"></i> Подписаться';
                 }
+
                 button.disabled = false;
             })
             .catch(error => {
-                console.error('Ошибка подписки:', error);
+                console.error('Ошибка при подписке:', error);
                 button.innerHTML = originalHTML;
                 button.disabled = originalDisabled;
-                alert('Произошла ошибка при обработке запроса: ' + error.message);
             });
         }
     });

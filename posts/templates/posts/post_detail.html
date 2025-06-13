@@ -7,9 +7,6 @@
 {% block title %}{{ post.title }}{% endblock %}
 {% block content %}
 
-{% block scripts %}
-  <script src="{% static 'js/subscriptions.js' %}"></script>
-{% endblock %}
 
   <div class="container mt-4">
 <h2>{{ post.title|default:"(Без заголовка)" }}</h2>
@@ -115,9 +112,11 @@
     <p class="text-danger">Пожалуйста, <a href="{% url 'login' %}">войдите</a>, чтобы оставить комментарий.</p>
     <a href="{% url 'posts:post_list' %}" class="btn btn-action mt-3">Назад</a>
 {% endif %}
-
-
   </div>
+{% endblock %}
+
+{% block scripts %}
+  <script src="{% static 'js/subscriptions.js' %}"></script>
 {% endblock %}
 
 {% block extra_js %}
@@ -204,7 +203,7 @@
           alert('Ошибка при отправке лайка/дизлайка');
         }
       } catch (error) {
-        alert('Ошибка сети');
+        alert('Войдите или зарегистрируйтесь');
       }
     });
   });
@@ -220,9 +219,6 @@
     return cookieValue;
   }
 </script>
-
-
-
 
 {% endblock %}
 
