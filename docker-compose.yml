@@ -47,7 +47,7 @@ services:
     volumes:
       - ./static:/app/static
       - ./staticfiles:/app/staticfiles
-      - media_volume:/media
+      - media_volume:/app/media
   tests:
     build: .
     command: >
