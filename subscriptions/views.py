@@ -76,11 +76,11 @@ class SubscriptionToggleView(LoginRequiredMixin, View):
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             # Формируем JSON-ответ для AJAX-запроса
             return JsonResponse({
-                'status': 'success',
-                'is_subscribed': is_subscribed,
+                'subscribed': is_subscribed,  # 🔧 ключ должен быть именно таким!
                 'message': message,
                 'subscribers_count': author.followers.count(),
             })
+
         else:
             # Для обычного запроса перенаправляем  на профиль
             if next_url:

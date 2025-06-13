@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<! --posts/templates/posts/post_detail.html -->
+<!-- posts/templates/posts/post_detail.html -->
 
 {% extends 'base.html' %}
 {% load static %}  <!-- ✅ Добавляем static-теги -->
@@ -8,7 +8,7 @@
 {% block content %}
 
 
-  <div class="container mt-4">
+<div class="container mt-4">
 <h2>{{ post.title|default:"(Без заголовка)" }}</h2>
     <!-- Проверяем, загружено ли изображение -->
     {% if post.image %}

@@ -178,7 +178,8 @@ class FeedView(LoginRequiredMixin, ListView):
         # Фильтруем посты только от этих авторов
         # return Post.objects.filter(author__in=subscribed_authors).order_by('-publication_date') # ленивая загрузка
         # return Post.objects.filter(author__in=subscribed_authors).select_related("author").order_by('-publication_date') # ленивая загрузка
-        return Post.objects.filter(author__in=subscribed_authors).select_related("author").prefetch_related("tags").order_by('-publication_date') # Если у постов есть ManyToMany или обратные связи (например, comments) используем ускоренную загрузку,
+        # return Post.objects.filter(author__in=subscribed_authors).select_related("author").prefetch_related("tags").order_by('-publication_date') # Если у постов есть ManyToMany или обратные связи (например, comments) используем ускоренную загрузку,
+        return Post.objects.filter(author__in=subscribed_authors).select_related("author").prefetch_related("tags").order_by('-publication_date')  # Жадная загрузка # Если у постов есть ManyToMany или обратные связи (например, comments) используем ускоренную загрузку,
 
 
 def archive_post(request, slug):

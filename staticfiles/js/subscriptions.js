@@ -1,12 +1,9 @@
-//* static/js/subscriptions.js *//
-
 function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
         const cookies = document.cookie.split(';');
         for (let i = 0; i < cookies.length; i++) {
             const cookie = cookies[i].trim();
-            // Does this cookie string begin with the name we want?
             if (cookie.startsWith(name + '=')) {
                 cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
                 break;
@@ -19,13 +16,13 @@ function getCookie(name) {
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Subscription script loaded!');
 
-    const subscriptionButtons = document.querySelectorAll('.subscription-toggle, [data-username], .otpis-btn');
-    console.log('Found subscription elements:', subscriptionButtons.length);
-
     document.addEventListener('click', function(event) {
-        if (event.target.closest('[data-username], .subscription-toggle, .otpis-btn') ||
-            event.target.textContent.includes('Отписаться')) {
-
+        if (
+            event.target.closest('[data-username]') ||
+            event.target.closest('.subscription-toggle') ||
+            event.target.closest('.otpis-btn') ||
+            event.target.textContent.includes('Отписаться')
+        ) {
             const button = event.target.closest('button, [type="submit"]');
             if (!button) return;
 
@@ -73,7 +70,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 alert('Сервер не отвечает, попробуйте позже.');
                 button.innerHTML = originalHTML;
                 button.disabled = originalDisabled;
-            }, 5000); // Таймаут запроса 5 секунд
+            }, 5000);
 
             fetch(`/subscriptions/toggle/${username}/`, {
                 method: 'POST',
@@ -85,8 +82,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 signal
             })
             .then(response => {
-                clearTimeout(fetchTimeout); // Сбрасываем таймаут при успешном ответе
-
+                clearTimeout(fetchTimeout);
                 if (!response.ok) {
                     throw new Error(`Ошибка сервера: ${response.status}`);
                 }
@@ -100,12 +96,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     subscribersCountElem.textContent = data.subscribers_count;
                 }
 
-                // Обновляем содержимое кнопки
-                if (data.subscribed) {
-                    button.innerHTML = '<i class="fa-solid fa-user-minus me-1 text-warning"></i> Отписаться';
-                } else {
-                    button.innerHTML = '<i class="fa-solid fa-user-plus me-1 text-warning"></i> Подписаться';
-                }
+                button.innerHTML = data.subscribed
+                    ? '<i class="fa-solid fa-user-minus me-1 text-warning"></i> Отписаться'
+                    : '<i class="fa-solid fa-user-plus me-1 text-warning"></i> Подписаться';
 
                 button.disabled = false;
             })
