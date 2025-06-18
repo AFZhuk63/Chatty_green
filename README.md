@@ -812,3 +812,10 @@ docker-compose run --rm tests.
 После прохождения тестов контейнер с тестами удалится и можно работать с проектом.
 ```
  
+## License
+
+This project is proprietary and closed-source.  
+All rights reserved © 2025 Anatoliy Zhuk.  
+Unauthorized use, redistribution, or deployment is prohibited.
+
+See full license in [LICENSE](./LICENSE).
