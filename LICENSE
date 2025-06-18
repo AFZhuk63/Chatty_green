@@ -1,0 +1,38 @@
+PROPRIETARY LICENSE AND CONTRIBUTION DECLARATION FOR PROJECT "CHATTY_GREEN"
+
+Copyright (c) 2025 Anatoliy Zhuk
+Email: af3557771@gmail.com
+Institution: https://tel-ran.de/
+
+All rights reserved.
+
+This software project, titled "Chatty_green", including all code, architecture, structure, and content,
+is the intellectual property of Anatoliy Zhuk. The project was developed as a diploma work at Tel-Ran.de.
+
+Unauthorized copying, redistribution, deployment (e.g., via AWS), or modification is strictly prohibited
+without written consent. All rights reserved.
+
+=== CONTRIBUTION OVERVIEW ===
+
+Based on commit analysis and architectural review, the following distribution of authorship is recognized:
+
+- **Anatoliy Zhuk** ("anatoliy-zhuk", "Anatoliy") — 138 commits (~53.7%)
+  • Developed the full structure of the project
+  • Authored all major application modules: `posts`, `videopost`, `ads`, `users`
+  • Implemented models, views, forms, admin, frontend scripts (`likes.js`, `share.js`), templates
+  • Designed and wrote the full README.md and system architecture
+
+- **Other contributors**:
+  • `subscriptions` and `db.sql` — technical support, non-core functionality
+  • `tests` by Sergei Lisitsyn — 36 commits, **not deployed**, **not documented**, **no instructions**
+
+Although other contributors submitted commits, the **architectural and operational backbone** of the system
+was developed solely by Anatoliy Zhuk.
+
+💡 Therefore, the rightful authorship share is declared as:
+**Anatoliy Zhuk: 85–90% of substantive contribution**
+
+All violations of author attribution, including removal of commit history or redeployment without consent,
+are subject to DMCA claims and institutional reporting.
+
+This document serves as both license and declaration of intellectual ownership.
