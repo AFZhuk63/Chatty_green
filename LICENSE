@@ -24,6 +24,7 @@ Based on commit analysis and architectural review, the following distribution of
 
 - **Other contributors**:
   • `subscriptions` and `db.sql` — technical support, non-core functionality
+  • `base.html, home.html, navbar.html, footer.html templates` with refactoring by Anatoly Zhuk
   • `tests` by Sergei Lisitsyn — 36 commits, **not deployed**, **not documented**, **no instructions**
 
 Although other contributors submitted commits, the **architectural and operational backbone** of the system
