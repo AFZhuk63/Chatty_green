@@ -1,9 +1,9 @@
-# docker-compose.yml
+# docker-compose.yml Chatty_green
 
 services:
-  db:
+  chatty_db:   # <-- было db
     build: ./db
-    container_name: db
+    container_name: chatty_db
     env_file:
       - .env
     environment:
@@ -11,35 +11,38 @@ services:
       - POSTGRES_USER=${PG_USER}
       - POSTGRES_PASSWORD=${PG_PASSWORD}
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - chatty_postgres_data:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - "5440:5432"   # <-- уникальный порт
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U ${PG_USER} -d ${PG_NAME}" ]
       interval: 5s
       timeout: 5s
       retries: 10
+    networks:
+      - chatty_net
 
   psql:
     image: postgres:13-alpine
-    container_name: psql
+    container_name: chatty_psql
     depends_on:
-      - db
+      - chatty_db
     env_file:
       - .env
-    command: sh -c "exec psql -h ${PG_HOST} -p ${PG_PORT} -U ${PG_USER} -d ${PG_NAME}"
+    command: sh -c "exec psql -h chatty_db -p 5432 -U ${PG_USER} -d ${PG_NAME}"
     tty: true
-
+    networks:
+      - chatty_net
 
   web:
     image: chatty_green_web:latest      # <-- добавили
     build: .
-    container_name: web
+    container_name: chatty_web
     command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
     ports:
-      - "8000:8000"
+      - "8010:8000"   # <-- уникальный порт
     depends_on:
-      - db
+      - chatty_db
     env_file:
       - .env
     environment:
@@ -47,7 +50,10 @@ services:
     volumes:
       - ./static:/app/static
       - ./staticfiles:/app/staticfiles
-      - media_volume:/app/media
+      - chatty_media:/app/media
+    networks:
+      - chatty_net
+
   tests:
     build: .
     command: >
@@ -55,20 +61,21 @@ services:
              pytest /app/tests/"
     depends_on:
       - web
-      - db
-
+      - chatty_db
     environment:
       - DJANGO_SETTINGS_MODULE=chatty.settings
       - PYTHONUNBUFFERED=1
-      - DB_HOST=db
+      - DB_HOST=chatty_db
       - DB_PORT=5432
       - RUN_MIGRATIONS=true  # Разрешаем миграции для тестов
     entrypoint: [ ]  # Переопределяем entrypoint из Dockerfile
     volumes:
-    - ./static:/app/static
-    - ./staticfiles:/app/staticfiles
+      - ./static:/app/static
+      - ./staticfiles:/app/staticfiles
     env_file: # <-- добавьте это!
       - .env
+    networks:
+      - chatty_net
 
 
 #  nginx:
@@ -78,11 +85,14 @@ services:
 #    depends_on:
 #      - web
 #    volumes:
-#      - media_volume:/media
+#      - chatty_media:/media
 #    ports:
 #      - "80:80"
 
 volumes:
-  postgres_data:
-  media_volume:
+  chatty_postgres_data:
+  chatty_media:
+
+networks:
+  chatty_net:
 
